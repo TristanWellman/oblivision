@@ -7,8 +7,18 @@ void run() {
         exit(1);
     }
 
-    init_graphics(1280, 720);
+    SDL_Event event;
 
+    OVInit(1280, 720);
+    int running = 1;
+    while(running == 1) {
+        SDL_PollEvent(&event);
+        if(event.type == SDL_QUIT) {
+            running = 0;
+        }
+        OV_COLOR color_test = {0x00, 0xff, 0xff};
+        OV_putPixel(1280 / 2, 720 / 2, color_test);
+    }
     SDL_Quit();
 }
 

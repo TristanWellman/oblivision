@@ -5,9 +5,9 @@
 #define WIDTH 1280
 #define HEIGHT 720
 
-typedef struct vec_s {
-    int x, y;
-} vec2;
+typedef struct color_s {
+    int r, g, b;
+} OV_COLOR;
 
 struct windata {
 
@@ -22,6 +22,7 @@ struct windata {
 
 };
 
-int init_graphics(int width, int height);
+void OV_putPixel(int x, int y, OV_COLOR color);
+int OVInit(int width, int height);
 
 #endif

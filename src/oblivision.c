@@ -5,6 +5,51 @@ struct windata winData;
 int current_x = 0;
 int current_y = 0;
 
+void OV_putPixel(int x, int y, OV_COLOR color) {
+    Uint32 p_color = SDL_MapRGB(winData.window->format,
+                                color.r, color.g, color.b);
+    int bpp = winData.window->format->BytesPerPixel;
+    if(SDL_MUSTLOCK(winData.window)) {
+        if(SDL_LockSurface(winData.window) < 0) {
+            printf("FATAL:: Could not lock screen!\n");
+            exit(1);
+        }
+    }
+
+    Uint8 *p = (Uint8 *)winData.window->pixels + y * winData.window->pitch + x * bpp;
+
+    switch(bpp) {
+        case 1:
+            *p = p_color;
+            break;
+
+        case 2:
+            *(Uint16 *)p = p_color;
+            break;
+
+        case 3:
+            if(SDL_BYTEORDER == SDL_BIG_ENDIAN) {
+                p[0] = (p_color >> 16) & 0xff;
+                p[1] = (p_color >> 8) & 0xff;
+                p[2] = p_color & 0xff;
+            } else {
+                p[0] = p_color & 0xff;
+                p[1] = (p_color >> 8) & 0xff;
+                p[2] = (p_color >> 16) & 0xff;
+            }
+            break;
+
+        case 4:
+            *(Uint32 *)p = p_color;
+            break;
+    }
+
+    if(SDL_MUSTLOCK(winData.window)) {
+        SDL_UnlockSurface(winData.window);
+    }
+    SDL_UpdateRect(winData.window, x, y, 1, 1);
+}
+
 void render_frame() {
 
     int color = BG;
@@ -27,17 +72,11 @@ void render_frame() {
     current_x = 0;
 }
 
-void update_position(char key) {
-
-}
-
-void keyboard_handle() {
-}
-
 void render_loop() {
+
 }
 
-int init_graphics(int width, int height) {
+int OVInit(int width, int height) {
 
     winData.width = width;
     winData.height = height;
@@ -49,7 +88,6 @@ int init_graphics(int width, int height) {
         printf("FATAL:: Could not set video mode!\n");
         exit(1);
     }
-
     render_loop();
 
     return 0;
