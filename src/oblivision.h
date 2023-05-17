@@ -6,7 +6,7 @@
 #define HEIGHT 720
 
 typedef struct color_s {
-    int r, g, b;
+    uint8_t color;
 } OV_COLOR;
 
 struct windata {
@@ -17,12 +17,16 @@ struct windata {
 
     int frame;
     int height, width;
-    int pixel_data[WIDTH * HEIGHT];
+    uint8_t pixel_data[WIDTH * HEIGHT];
+    uint8_t last_pixel_data[WIDTH * HEIGHT];
     int exit;
 
 };
 
+void OV_colorTest();
+void OV_setBackground(OV_COLOR bg_color);
 void OV_putPixel(int x, int y, OV_COLOR color);
-int OVInit(int width, int height);
+void OV_renderFrame();
+int OVInit(SDL_Surface *window, int width, int height);
 
 #endif
