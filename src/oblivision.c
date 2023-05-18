@@ -1,45 +1,89 @@
 #include "oblivision.h"
 
 struct windata winData;
+struct widget_data wigData;
 
 int current_x = 0;
 int current_y = 0;
 
+void add_to_queue(int type) {
+
+}
+
 void OV_colorTest() {
 
     OV_COLOR start_color = {BG};
+   // if (winData.pixel_data[0] != RED) {
+        for (current_x = 0; current_x < winData.width; current_x++) {
+            for (current_y = 0; current_y < winData.height; current_y++) {
+                winData.pixel_data[current_y * winData.width + current_x] = start_color.color;
+                start_color.color = start_color.color + current_x * current_y;
+            }
+        }
+    //}
 
-    for(current_x = 0; current_x < winData.width; current_x++) {
-        for(current_y = 0; current_y < winData.height; current_y++) {
-            winData.pixel_data[current_y * winData.width + current_x] = start_color.color;
-            start_color.color = start_color.color + current_x*current_y;
-        }
-    }
-    int i;
-    for(i = 0; i < sizeof(winData.pixel_data); i++) {
-        if(winData.pixel_data[i] == 0) {
-            break;
-        }
-        winData.last_pixel_data = winData.pixel_data;
-    }
     current_x = 0;
     current_y = 0;
 }
 
 void OV_setBackground(OV_COLOR bg_color) {
 
-    for(current_x = 0; current_x < winData.width; current_x++) {
-        for(current_y = 0; current_y < winData.height; current_y++) {
-            winData.pixel_data[current_y * winData.width + current_x] = bg_color.color;
+    if (winData.pixel_data[0] != RED) {
+        for (current_x = 0; current_x < winData.width; current_x++) {
+            for (current_y = 0; current_y < winData.height; current_y++) {
+                winData.pixel_data[current_y * winData.width + current_x] = bg_color.color;
+            }
         }
     }
-
     current_x = 0;
     current_y = 0;
 
 }
 
+int OV_createWindow(int width, int height, vec2 pos, const char *name) {
+
+    int i;
+    for(i = 0; i < sizeof(wigData.names); i++) {
+        if(wigData.names[i] == name) {
+            return 1;
+        }
+        if(wigData.names[i] == NULL) {
+            wigData.names[i] = name;
+            wigData.wig_pos[i] = pos;
+            wigData.wig_sizes[i] = (vec2){width, height};
+            printf("[%d]%s: (%d,%d)\n", i, name, wigData.wig_pos[i].x, wigData.wig_pos[i].y);
+            break;
+        }
+    }
+
+    return 0;
+}
+
+void load_widgets() {
+    int i;
+    current_x = 0;
+    current_y = 0;
+    for(i = 0; i < sizeof(wigData.names); i++) {
+        if(wigData.names[i] == NULL) {
+            break;
+        }
+        for(current_x = 0; current_x < winData.width; current_x++) {
+            if(current_x == wigData.wig_pos[i].x+1) {
+                break;
+            }
+            for(current_y = 0; current_y < winData.height; current_y++) {
+                 if(current_x == wigData.wig_pos[i].x && current_y == wigData.wig_pos[i].y) {
+                     winData.pixel_data[current_y * winData.width + current_x] = ORANGE;
+                     break;
+                }
+            }
+        }
+    }
+}
+
 void OV_renderFrame() {
+
+    load_widgets();
 
     SDL_UpdateTexture(winData.texture, NULL,
                       winData.pixel_data, winData.width * 4);
@@ -47,10 +91,13 @@ void OV_renderFrame() {
     SDL_RenderCopyEx(
             winData.renderer, winData.texture,
             NULL, NULL, 0.0, NULL,
-            SDL_FLIP_VERTICAL
+            0
             );
 
     SDL_RenderPresent(winData.renderer);
+
+    winData.pixel_data[0] = RED;
+    SDL_Delay(41);
 
 }
 
@@ -59,6 +106,10 @@ int OVInit(SDL_Window *window, int width, int height, const char *winname) {
     winData.window = window;
     winData.width = width;
     winData.height = height;
+    wigData.num_wigs = 0;
+    OV_CENTERED.x = winData.width/2;
+    OV_CENTERED.y = winData.height/2;
+
 
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("FATAL:: Could not init SDL2!\n");
@@ -99,7 +150,10 @@ int OVInit(SDL_Window *window, int width, int height, const char *winname) {
 
     int i;
     for(i = 0; i < sizeof(winData.pixel_data); i++) {
-
+        if(i >= winData.width * winData.height) {
+            break;
+        }
+        winData.pixel_data[i] = 0;
     }
 
     return 0;

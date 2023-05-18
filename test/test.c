@@ -8,13 +8,20 @@ int main(int argc, char *argv[]) {
     OVInit(window, 1280, 720, "test");
     int running = 1;
     while(running == 1) {
-        SDL_PollEvent(&event);
-        if(event.type == SDL_QUIT) {
-            running = 0;
+        while(SDL_PollEvent(&event) != 0) {
+            if(event.type == SDL_QUIT) {
+                running = 0;
+                break;
+            }
         }
         OV_COLOR color_test = {GREY};
-        //OV_colorTest();
+        /*OV_colorTest();*/
         OV_setBackground(color_test);
+
+        /*Create window widget*/
+        OV_createWindow(20, 20, (vec2){200, 200}, "test");
+        OV_createWindow(20, 20, (vec2){500, 500}, "test2");
+
         OV_renderFrame();
     }
 
