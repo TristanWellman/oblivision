@@ -1,8 +1,7 @@
 #include "../src/util.h"
 #include "../src/oblivision.h"
 
-void run() {
-
+int main(int argc, char *argv[]) {
     SDL_Window *window;
     SDL_Event event;
 
@@ -20,16 +19,5 @@ void run() {
     }
 
     OV_free();
-}
-
-#if defined __WIN32 | __WIN64 | __WIN32__ | __WIN64__
-int WinMain(int argc, char *argv[]) {
-    run();
     return 0;
 }
-#else
-int main(int argc, char *argv[]) {
-    run();
-    return 0;
-}
-#endif
