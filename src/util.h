@@ -7,7 +7,7 @@
 #include <math.h>
 #include <stdint.h>
 #define SDL_MAIN_HANDLED
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 #include "colors.h"
 

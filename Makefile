@@ -5,7 +5,7 @@ LOC= $(BIN)/$(LNAME)
 CC= gcc
 CFLAGS= -m32 -g -I "SDL/include"
 LFLAGS= -L "$(BIN)" -loblivision \
-	-L "SDL/lib" -lSDL
+	-L "SDL/lib" -lSDL2
 
 
 COMMON_C= src/oblivision.c
@@ -17,7 +17,7 @@ NAME= test
 all: base
 
 base:
-	$(CC) $(CFLAGS) -L "SDL/lib" -lSDL -L src -c $(COMMON_C)
+	$(CC) $(CFLAGS) -L "SDL/lib" -lSDL2 -L src -c $(COMMON_C)
 	$(AR) rcs $(LOC) $(COMMON_O)
 
 test_:
