@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
         OV_setBackground(color_test);
 
         /*Create window widget*/
-        OV_createWindow(20, 20, (vec2){200, 200}, "test");
+        OV_createWindow(256, 144, (vec2){200, 200}, "test");
         OV_createWindow(20, 20, (vec2){500, 500}, "test2");
 
         OV_renderFrame();
