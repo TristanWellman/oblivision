@@ -1,3 +1,5 @@
+/*Copyright (c) 2023, Tristan Wellman*/
+
 #ifndef RENDERER_COLORS_H
 #define RENDERER_COLORS_H
 

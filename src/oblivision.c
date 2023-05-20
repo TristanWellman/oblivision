@@ -1,3 +1,5 @@
+/*Copyright (c) 2023, Tristan Wellman*/
+
 #include "oblivision.h"
 
 struct windata winData;
@@ -9,14 +11,12 @@ int current_y = 0;
 void OV_colorTest() {
 
     OV_COLOR start_color = {BG};
-   // if (winData.pixel_data[0] != RED) {
         for (current_x = 0; current_x < winData.width; current_x++) {
             for (current_y = 0; current_y < winData.height; current_y++) {
                 winData.pixel_data[current_y * winData.width + current_x] = start_color.color;
                 start_color.color = start_color.color + current_x * current_y;
             }
         }
-    //}
 
     current_x = 0;
     current_y = 0;
@@ -74,6 +74,16 @@ void load_widgets() {
                      for(x2 = wigData.wig_pos[i].x; x2 < (wigData.wig_pos[i].x + wigData.wig_sizes[i].x); x2++) {
                          for(y2 = wigData.wig_pos[i].y; y2 < (wigData.wig_pos[i].y + wigData.wig_sizes[i].y); y2++) {
                              winData.pixel_data[y2 * winData.width + x2] = ORANGE;
+                         }
+                     }
+                     /*make title bar*/
+                     vec2 bar_pos = {wigData.wig_pos[i].x, wigData.wig_pos[i].y-10};
+                     vec2 bar_size = {wigData.wig_sizes[i].x, 10};
+                     int x3,y3,x4,y4;
+
+                     for(x3 = bar_pos.x; x3 < (bar_pos.x + bar_size.x); x3++) {
+                         for(y3 = bar_pos.y; y3 < (bar_pos.y + bar_size.y); y3++) {
+                             winData.pixel_data[y3 * winData.width + x3] = BLACK;
                          }
                      }
                      break;

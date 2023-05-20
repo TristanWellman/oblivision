@@ -1,3 +1,5 @@
+/*Copyright (c) 2023, Tristan Wellman*/
+
 #ifndef RENDERER_UTIL_H
 #define RENDERER_UTIL_H
 

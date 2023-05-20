@@ -1,3 +1,5 @@
+/*Copyright (c) 2023, Tristan Wellman*/
+
 #ifndef RENDERER_GRAPHICS_H
 #define RENDERER_GRAPHICS_H
 #include "util.h"
