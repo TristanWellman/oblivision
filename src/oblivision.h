@@ -32,14 +32,13 @@ struct windata {
     const char *fonttitle;
     TTF_Font *font;
 
-    const char *keystate;
+    OV_COLOR bg_color;
 
     int pixel_data[MAXWID*MAXHEI];
     char *last_pixel_data;
 
-    int frame;
     int height, width;
-    int exit;
+    int in_window;
 
 };
 
@@ -56,7 +55,8 @@ void OV_colorTest();
 void OV_setBackground(OV_COLOR bg_color);
 void OV_putPixel(int x, int y, OV_COLOR color);
 int OV_createWindow(int width, int height, vec2 pos, const char *name);
-void OV_renderFrame();
+void OV_pollEvent(SDL_Event event);
+void OV_renderFrame(SDL_Event event);
 void OV_setFlags(int flag);
 void OV_setFont(const char *font);
 int OVInit(SDL_Window *window, int width, int height, const char *winname);

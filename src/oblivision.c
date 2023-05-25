@@ -23,7 +23,7 @@ void OV_colorTest() {
 }
 
 void OV_setBackground(OV_COLOR bg_color) {
-
+    winData.bg_color = bg_color;
     if (winData.pixel_data[0] != RED) {
         for (current_x = 0; current_x < winData.width; current_x++) {
             for (current_y = 0; current_y < winData.height; current_y++) {
@@ -98,7 +98,93 @@ void load_widgets() {
     }
 }
 
-void OV_renderFrame() {
+void unload_widget(int widget_offset) {
+    current_x = 0;
+    current_y = 0;
+    int x2,y2;
+    for(current_x = 0; current_x < winData.width; current_x++) {
+        if(current_x == wigData.wig_pos[widget_offset].x+1) {
+            break;
+        }
+        for(current_y = 0; current_y < winData.height; current_y++) {
+            if(current_x == wigData.wig_pos[widget_offset].x &&
+                current_y == wigData.wig_pos[widget_offset].y) {
+                winData.pixel_data[current_y * winData.width + current_x] = winData.bg_color.color;
+                for(x2 = wigData.wig_pos[widget_offset].x;
+                    x2 < (wigData.wig_pos[widget_offset].x + wigData.wig_sizes[widget_offset].x); x2++) {
+                    for(y2 = wigData.wig_pos[widget_offset].y;
+                        y2 < (wigData.wig_pos[widget_offset].y + wigData.wig_sizes[widget_offset].y); y2++) {
+                        winData.pixel_data[y2 * winData.width + x2] = winData.bg_color.color;
+                    }
+                }
+                /*make title bar*/
+                vec2 bar_pos = {wigData.wig_pos[widget_offset].x, wigData.wig_pos[widget_offset].y-20};
+                vec2 bar_size = {wigData.wig_sizes[widget_offset].x, 20};
+                int x3,y3,x4,y4;
+
+                for(x3 = bar_pos.x; x3 < (bar_pos.x + bar_size.x); x3++) {
+                    for(y3 = bar_pos.y; y3 < (bar_pos.y + bar_size.y); y3++) {
+                        winData.pixel_data[y3 * winData.width + x3] = winData.bg_color.color;
+                    }
+                }
+                break;
+            }
+        }
+    }
+}
+
+int in_window = MAX_WIGS+1;
+void update_position(SDL_Event event) {
+    vec2 mouse_pos;
+    int i, j, k;
+
+    SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
+    //printf("%d:%d\n", mouse_pos.x, mouse_pos.y);
+    if(event.type == SDL_MOUSEBUTTONDOWN) {
+        //printf("%d:%d\n", mouse_pos.x, mouse_pos.y);
+        for(i = 0; i < MAX_WIGS; i++) {
+            for(j = wigData.wig_pos[i].x; j < (wigData.wig_pos[i].x + wigData.wig_sizes[i].x); j++) {
+                for(k = wigData.wig_pos[i].y; k < (wigData.wig_pos[i].y + wigData.wig_sizes[i].y); k++) {
+                    if(j == mouse_pos.x && k == mouse_pos.y) {
+                        winData.in_window = i;
+                        break;
+                    }
+                    if(winData.in_window == i) {
+                        break;
+                    }
+                }
+            }
+        }
+        //printf("%d\n", winData.in_window);
+    }
+    if(event.type == SDL_MOUSEBUTTONUP) {
+        vec2 prev_wiv_pos;
+        //printf("%d\n", winData.in_window);
+        for(i = 0; i < MAX_WIGS; i++) {
+            if(i == winData.in_window) {
+                prev_wiv_pos.x = wigData.wig_pos[i].x;
+                prev_wiv_pos.y = wigData.wig_pos[i].y;
+                unload_widget(i);
+                wigData.wig_pos[i].x = mouse_pos.x;
+                wigData.wig_pos[i].y = mouse_pos.y;
+
+                break;
+            }
+        }
+    }
+}
+
+void OV_pollEvent(SDL_Event event) {
+    while (SDL_PollEvent(&event) != 0) {
+        if (event.type == SDL_QUIT) {
+            OV_free();
+            break;
+        }
+        update_position(event);
+    }
+}
+
+void OV_renderFrame(SDL_Event event) {
 
     Uint64 start = SDL_GetPerformanceCounter();
 
@@ -127,7 +213,7 @@ void OV_renderFrame() {
     }
 
     winData.pixel_data[0] = RED;
-    SDL_Delay(41);
+    SDL_Delay(38);
 
     Uint64 end = SDL_GetPerformanceCounter();
     float elapsed = (end - start)/(float)SDL_GetPerformanceFrequency();
@@ -161,6 +247,7 @@ int OVInit(SDL_Window *window, int width, int height, const char *winname) {
     winData.width = width;
     winData.height = height;
     wigData.num_wigs = 0;
+    winData.in_window = MAX_WIGS+1;
     /*OV_CENTERED.x = winData.width/2;
     OV_CENTERED.y = winData.height/2;*/
 
@@ -232,4 +319,5 @@ void OV_free() {
     TTF_CloseFont(winData.font);
     TTF_Quit();
     SDL_Quit();
+    exit(0);
 }
