@@ -14,6 +14,8 @@
 #define BLACK 0x000000FF
 #define WHITE 0xFFFFFFFF
 
+#define WINBAR_BG 0x3e5b6aff
+#define WIN_BG 0x627986ff
 #define BG 0x00B7FFFF
 
 #endif

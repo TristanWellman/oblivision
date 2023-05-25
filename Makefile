@@ -3,9 +3,9 @@ LNAME= liboblivision.a
 LOC= $(BIN)/$(LNAME)
 
 CC= gcc
-CFLAGS= -m32 -g -I "SDL/include"
+CFLAGS= -g -I "SDL/include"
 LFLAGS= -L "$(BIN)" -loblivision \
-	-L "SDL/lib" -lSDL2
+	-L "SDL/lib" -lSDL2 -L "SDL_ttf/lib" -lSDL2_ttf
 
 
 COMMON_C= src/oblivision.c
@@ -14,12 +14,20 @@ COMMON_O= oblivision.o
 COMMON_TEST= test/test.c
 NAME= test
 
-all: base
+all: base test_
 
 base:
-	$(CC) $(CFLAGS) -L "SDL/lib" -lSDL2 -L src -c $(COMMON_C)
+	$(CC) $(CFLAGS) -L "SDL/lib" -lSDL2 -L "ttf/lib" -lSDL2_ttf -L src -c $(COMMON_C)
 	$(AR) rcs $(LOC) $(COMMON_O)
 
 test_:
-	$(CC) -o $(NAME) $(COMMON_TEST) $(CFLAGS) $(LFLAGS)
+	$(CC)  -o $(NAME) $(COMMON_TEST) $(CFLAGS) $(LFLAGS)
+
+base-x32: test_-x32
+	$(CC) -m32 $(CFLAGS) -L "SDL/lib" -lSDL2 -L src -c $(COMMON_C)
+	$(AR) rcs $(LOC) $(COMMON_O)
+
+test_-x32:
+	$(CC) -o $(NAME) $(COMMON_TEST) -m32 $(CFLAGS) $(LFLAGS)
+
 

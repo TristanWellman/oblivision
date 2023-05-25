@@ -73,44 +73,86 @@ void load_widgets() {
                      winData.pixel_data[current_y * winData.width + current_x] = ORANGE;
                      for(x2 = wigData.wig_pos[i].x; x2 < (wigData.wig_pos[i].x + wigData.wig_sizes[i].x); x2++) {
                          for(y2 = wigData.wig_pos[i].y; y2 < (wigData.wig_pos[i].y + wigData.wig_sizes[i].y); y2++) {
-                             winData.pixel_data[y2 * winData.width + x2] = ORANGE;
+                             winData.pixel_data[y2 * winData.width + x2] = WIN_BG;
                          }
                      }
                      /*make title bar*/
-                     vec2 bar_pos = {wigData.wig_pos[i].x, wigData.wig_pos[i].y-10};
-                     vec2 bar_size = {wigData.wig_sizes[i].x, 10};
+                     vec2 bar_pos = {wigData.wig_pos[i].x, wigData.wig_pos[i].y-20};
+                     vec2 bar_size = {wigData.wig_sizes[i].x, 20};
                      int x3,y3,x4,y4;
 
                      for(x3 = bar_pos.x; x3 < (bar_pos.x + bar_size.x); x3++) {
                          for(y3 = bar_pos.y; y3 < (bar_pos.y + bar_size.y); y3++) {
-                             winData.pixel_data[y3 * winData.width + x3] = BLACK;
+                             winData.pixel_data[y3 * winData.width + x3] = WINBAR_BG;
                          }
                      }
                      break;
                 }
             }
         }
+        /*Load bar title*/
+        winData.text_surface[i] = TTF_RenderText_Blended(winData.font,
+                                                       wigData.names[i],
+                                                       (SDL_Color){255,255,255});
+        winData.text_texture[i] = SDL_CreateTextureFromSurface(winData.renderer, winData.text_surface[i]);
     }
 }
 
 void OV_renderFrame() {
 
+    Uint64 start = SDL_GetPerformanceCounter();
+
     load_widgets();
+
+    SDL_SetRenderTarget(winData.renderer, winData.target_texture);
 
     SDL_UpdateTexture(winData.texture, NULL,
                       winData.pixel_data, winData.width * 4);
 
-    SDL_RenderCopyEx(
-            winData.renderer, winData.texture,
-            NULL, NULL, 0.0, NULL,
-            0
-            );
+    SDL_RenderCopy(winData.renderer, winData.texture,
+            NULL, NULL);
 
-    SDL_RenderPresent(winData.renderer);
+    SDL_Rect title_rect;
+    int i;
+    for(i = 0; i < MAX_WIGS; i++) {
+        if(wigData.names[i] == NULL) {
+            break;
+        }
+        title_rect.x = wigData.wig_pos[i].x;
+        title_rect.y = wigData.wig_pos[i].y-20;
+        title_rect.w = wigData.wig_sizes[i].x/2;
+        title_rect.h = 20;
+        SDL_RenderCopy(winData.renderer, winData.text_texture[i],
+                       NULL, &title_rect);
+    }
 
     winData.pixel_data[0] = RED;
     SDL_Delay(41);
 
+    Uint64 end = SDL_GetPerformanceCounter();
+    float elapsed = (end - start)/(float)SDL_GetPerformanceFrequency();
+    //printf("FPS: %d\n", (int)(1.0f/elapsed));
+    if(winData.ovflag == OV_DEBUG_ENABLE) {
+        char buf[0x100];
+        snprintf(buf, sizeof(buf), "FPS: %d", (int) (1.0f / elapsed));
+        SDL_Surface *fps_surface = TTF_RenderText_Solid(winData.font, buf,
+                                                        (SDL_Color) {255, 75, 75});
+        SDL_Texture *fps_texture = SDL_CreateTextureFromSurface(winData.renderer, fps_surface);
+        SDL_Rect fps_rect = {0, winData.height - 24, 100, 24};
+        SDL_RenderCopy(winData.renderer, fps_texture, NULL, &fps_rect);
+    }
+    SDL_SetRenderTarget(winData.renderer, NULL);
+    SDL_RenderPresent(winData.renderer);
+
+}
+
+void OV_setFlags(int flag) {
+    if(flag != 0) {
+        winData.ovflag = flag;
+    }
+}
+void OV_setFont(const char *font) {
+    winData.fonttitle = font;
 }
 
 int OVInit(SDL_Window *window, int width, int height, const char *winname) {
@@ -119,12 +161,12 @@ int OVInit(SDL_Window *window, int width, int height, const char *winname) {
     winData.width = width;
     winData.height = height;
     wigData.num_wigs = 0;
-    OV_CENTERED.x = winData.width/2;
-    OV_CENTERED.y = winData.height/2;
+    /*OV_CENTERED.x = winData.width/2;
+    OV_CENTERED.y = winData.height/2;*/
 
 
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
-        printf("FATAL:: Could not init SDL2!\n");
+        printf("FATAL:: Could not init SDL2_ttf!\n");
         exit(1);
     }
 
@@ -160,6 +202,16 @@ int OVInit(SDL_Window *window, int width, int height, const char *winname) {
         exit(1);
     }
 
+    if(TTF_Init() < 0) {
+        printf("FATAL:: Could not init TTF!\n");
+        exit(1);
+    }
+    winData.font = TTF_OpenFont(winData.fonttitle, 24);
+    if(winData.font == NULL) {
+        printf("FATAL:: Could not load font!\n");
+        exit(1);
+    }
+
     int i;
     for(i = 0; i < sizeof(winData.pixel_data); i++) {
         if(i >= winData.width * winData.height) {
@@ -177,4 +229,7 @@ void OV_free() {
     SDL_DestroyTexture(winData.texture);
     SDL_DestroyWindow(winData.window);
     SDL_DestroyRenderer(winData.renderer);
+    TTF_CloseFont(winData.font);
+    TTF_Quit();
+    SDL_Quit();
 }

@@ -5,7 +5,12 @@ int main(int argc, char *argv[]) {
     SDL_Window *window;
     SDL_Event event;
 
+    /*Shows fps*/
+    OV_setFlags(OV_DEBUG_ENABLE);
+
+    OV_setFont("iosevka.ttc");
     OVInit(window, 1280, 720, "test");
+
     int running = 1;
     while(running == 1) {
         while(SDL_PollEvent(&event) != 0) {
@@ -18,9 +23,10 @@ int main(int argc, char *argv[]) {
         /*OV_colorTest();*/
         OV_setBackground(color_test);
 
-        /*Create window widget*/
-        OV_createWindow(256, 144, (vec2){200, 200}, "test");
-        OV_createWindow(20, 20, (vec2){500, 500}, "test2");
+        /*Create window widget
+         * Y position has to be at-least 20 */
+        OV_createWindow(256, 144, (vec2){0, 20}, "Window 1");
+        OV_createWindow(200, 20, (vec2){700, 500}, "Window 2");
 
         OV_renderFrame();
     }
