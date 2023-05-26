@@ -8,6 +8,11 @@
   <br />
 </div>
 
+## Support
+
+- [x] Windows XP - Windows 10
+- [ ] Linux (Untested)
+
 ## Build
 
 Bulding requires:

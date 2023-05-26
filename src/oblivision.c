@@ -45,6 +45,9 @@ int OV_createWindow(int width, int height, vec2 pos, const char *name) {
         }
         if(wigData.names[i] == NULL) {
             wigData.names[i] = name;
+            if(pos.y < 20) {
+                pos.y = 20;
+            }
             wigData.wig_pos[i] = pos;
             wigData.wig_sizes[i] = (vec2){width, height};
             printf("[%d]%s: (%d,%d)\n", i, name, wigData.wig_pos[i].x, wigData.wig_pos[i].y);
@@ -144,7 +147,7 @@ void update_position(SDL_Event event) {
         //printf("%d:%d\n", mouse_pos.x, mouse_pos.y);
         for(i = 0; i < MAX_WIGS; i++) {
             for(j = wigData.wig_pos[i].x; j < (wigData.wig_pos[i].x + wigData.wig_sizes[i].x); j++) {
-                for(k = wigData.wig_pos[i].y; k < (wigData.wig_pos[i].y + wigData.wig_sizes[i].y); k++) {
+                for(k = wigData.wig_pos[i].y-20; k < wigData.wig_pos[i].y; k++) {
                     if(j == mouse_pos.x && k == mouse_pos.y) {
                         winData.in_window = i;
                         break;

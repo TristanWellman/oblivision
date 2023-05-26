@@ -23,8 +23,8 @@ base:
 test_:
 	$(CC)  -o $(NAME) $(COMMON_TEST) $(CFLAGS) $(LFLAGS)
 
-base-x32: test_-x32
-	$(CC) -m32 $(CFLAGS) -L "SDL/lib" -lSDL2 -L src -c $(COMMON_C)
+base-x32:
+	$(CC) -m32 $(CFLAGS) -L "SDL/lib" -lSDL2 -L "ttf/lib" -lSDL2_ttf -L src -c $(COMMON_C)
 	$(AR) rcs $(LOC) $(COMMON_O)
 
 test_-x32:
