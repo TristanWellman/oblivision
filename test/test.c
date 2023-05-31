@@ -1,4 +1,3 @@
-#include "../src/util.h"
 #include "../src/oblivision.h"
 
 int main(int argc, char *argv[]) {

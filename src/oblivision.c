@@ -168,6 +168,9 @@ void update_position(SDL_Event event) {
                 prev_wiv_pos.x = wigData.wig_pos[i].x;
                 prev_wiv_pos.y = wigData.wig_pos[i].y;
                 unload_widget(i);
+                if(mouse_pos.y < 20) {
+                    mouse_pos.y = 20;
+                }
                 wigData.wig_pos[i].x = mouse_pos.x;
                 wigData.wig_pos[i].y = mouse_pos.y;
 
@@ -187,7 +190,7 @@ void OV_pollEvent(SDL_Event event) {
     }
 }
 
-void OV_renderFrame(SDL_Event event) {
+void OV_renderFrame() {
 
     Uint64 start = SDL_GetPerformanceCounter();
 
