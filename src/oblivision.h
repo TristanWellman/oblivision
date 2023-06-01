@@ -97,6 +97,12 @@ void OV_colorTest();
 void OV_setBackground(OV_COLOR bg_color);
 
 /**
+ * @brief Fills pixels within a window with specified pixel data.
+ * @note Oblivision should be initialized prior to OV_fillWindowData
+ * */
+void OV_fillWindowData(const char *window_ID, int pixel_data[]);
+
+/**
  * @brief Initializes and creates an Oblivision window.
  * @note Oblivision should be initialized prior to OV_createWindow
  *

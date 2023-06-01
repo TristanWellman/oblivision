@@ -36,6 +36,26 @@ void OV_setBackground(OV_COLOR bg_color) {
 
 }
 
+int custom_window_fill = MAX_WIGS+1;
+int current_pixel_data[];
+void OV_fillWindowData(const char *window_ID, int pixel_data[]) {
+    int i;
+    for(i = 0; i < MAX_WIGS; i++) {
+        if(wigData.names[i] == window_ID) {
+            custom_window_fill = i;
+            break;
+        }
+    }
+    if(custom_window_fill == MAX_WIGS+1) {
+        printf("ERROR:: %s: Wrong window ID!\n", window_ID);
+    } else {
+        int j;
+        for(j = 0; j < sizeof(*pixel_data); j++) {
+            current_pixel_data[j] = pixel_data[j];
+        }
+    }
+}
+
 int OV_createWindow(int width, int height, vec2 pos, const char *name) {
 
     int i;
@@ -74,9 +94,18 @@ void load_widgets() {
             for(current_y = 0; current_y < winData.height; current_y++) {
                  if(current_x == wigData.wig_pos[i].x && current_y == wigData.wig_pos[i].y) {
                      winData.pixel_data[current_y * winData.width + current_x] = ORANGE;
-                     for(x2 = wigData.wig_pos[i].x; x2 < (wigData.wig_pos[i].x + wigData.wig_sizes[i].x); x2++) {
-                         for(y2 = wigData.wig_pos[i].y; y2 < (wigData.wig_pos[i].y + wigData.wig_sizes[i].y); y2++) {
-                             winData.pixel_data[y2 * winData.width + x2] = WIN_BG;
+                     if(i == custom_window_fill) {
+                         for(x2 = wigData.wig_pos[i].x; x2 < (wigData.wig_pos[i].x + wigData.wig_sizes[i].x); x2++) {
+                             for(y2 = wigData.wig_pos[i].y; y2 < (wigData.wig_pos[i].y + wigData.wig_sizes[i].y); y2++) {
+                                 winData.pixel_data[y2 * winData.width + x2] = current_pixel_data[x2+y2];
+                             }
+                         }
+                     } else {
+                         for (x2 = wigData.wig_pos[i].x; x2 < (wigData.wig_pos[i].x + wigData.wig_sizes[i].x); x2++) {
+                             for (y2 = wigData.wig_pos[i].y;
+                                  y2 < (wigData.wig_pos[i].y + wigData.wig_sizes[i].y); y2++) {
+                                 winData.pixel_data[y2 * winData.width + x2] = WIN_BG;
+                             }
                          }
                      }
                      /*make title bar*/
@@ -305,9 +334,9 @@ int OVInit(SDL_Window *window, int width, int height, const char *winname) {
         exit(1);
     }
 
-    int i;
+    int i,j,k;
     for(i = 0; i < sizeof(winData.pixel_data); i++) {
-        if(i >= winData.width * winData.height) {
+        if (i >= winData.width * winData.height) {
             break;
         }
         winData.pixel_data[i] = 0;
