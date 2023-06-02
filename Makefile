@@ -12,7 +12,7 @@ COMMON_C= src/oblivision.c
 COMMON_O= oblivision.o
 
 COMMON_TEST= test/test.c
-COLOR_TEST= test/wincolor.c
+COLOR_TEST= test/winbuffer.c
 NAME= test
 
 all: base test_

@@ -56,6 +56,18 @@ void OV_fillWindowData(const char *window_ID, int pixel_data[]) {
     }
 }
 
+void OV_addText(const char *window_ID, char *text) {
+    int wig_index;
+    int i;
+    for(i = 0; i < MAX_WIGS; i++) {
+        if(wigData.names[i] == window_ID) {
+            wig_index = i;
+            break;
+        }
+    }
+
+}
+
 int OV_createWindow(int width, int height, vec2 pos, const char *name) {
 
     int i;
@@ -233,18 +245,17 @@ void OV_renderFrame() {
     SDL_RenderCopy(winData.renderer, winData.texture,
             NULL, NULL);
 
-    SDL_Rect title_rect;
     int i;
     for(i = 0; i < MAX_WIGS; i++) {
         if(wigData.names[i] == NULL) {
             break;
         }
-        title_rect.x = wigData.wig_pos[i].x;
-        title_rect.y = wigData.wig_pos[i].y-20;
-        title_rect.w = wigData.wig_sizes[i].x/2;
-        title_rect.h = 20;
+        wigData.title_rect[i].x = wigData.wig_pos[i].x;
+        wigData.title_rect[i].y = wigData.wig_pos[i].y-20;
+        wigData.title_rect[i].w = /*wigData.wig_sizes[i].x/2*/ strlen(wigData.names[i])*PIXELSPERCHAR;
+        wigData.title_rect[i].h = 20;
         SDL_RenderCopy(winData.renderer, winData.text_texture[i],
-                       NULL, &title_rect);
+                       NULL, &wigData.title_rect[i]);
     }
 
     winData.pixel_data[0] = RED;
@@ -256,10 +267,10 @@ void OV_renderFrame() {
     if(winData.ovflag == OV_DEBUG_ENABLE) {
         char buf[0x100];
         snprintf(buf, sizeof(buf), "FPS: %d", (int) (1.0f / elapsed));
-        SDL_Surface *fps_surface = TTF_RenderText_Solid(winData.font, buf,
+        SDL_Surface *fps_surface = TTF_RenderText_Blended(winData.font, buf,
                                                         (SDL_Color) {255, 75, 75});
         SDL_Texture *fps_texture = SDL_CreateTextureFromSurface(winData.renderer, fps_surface);
-        SDL_Rect fps_rect = {0, winData.height - 24, 100, 24};
+        SDL_Rect fps_rect = {0, winData.height - 24, 100, 20};
         SDL_RenderCopy(winData.renderer, fps_texture, NULL, &fps_rect);
     }
     SDL_SetRenderTarget(winData.renderer, NULL);
