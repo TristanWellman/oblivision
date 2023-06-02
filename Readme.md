@@ -3,7 +3,7 @@
 <div align="center">
   <br />
   <p>
-    <a href="https://github.com/TristanWellman/oblivision"><img src="https://github.com/TristanWellman/oblivision/blob/master/window.PNG" width="800" alt="oblivision" /></a>
+    <a href="https://github.com/TristanWellman/oblivision"><img src="oblivision.png" width="500" alt="oblivision" /></a>
   </p>
   <br />
 </div>
@@ -11,7 +11,7 @@
 ## Support
 
 - [x] Windows XP - Windows 10
-- [ ] Linux (Untested)
+- [x] Linux
 
 ## Example
 
@@ -38,6 +38,14 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 ```
+<div>
+  <br />
+  <p>
+    <a href="https://github.com/TristanWellman/oblivision"><img src="window.PNG" width="1282" alt="oblivision" /></a>
+  </p>
+  <br />
+</div>
+
 
 ## Build
 
