@@ -86,6 +86,11 @@ struct widget_data {
     vec2 wig_pos[MAX_WIGS];
 
     SDL_Rect title_rect[MAX_WIGS];
+
+    SDL_Surface *wig_texts_surfaces[MAX_WIGS][MAX_WIGS];
+    SDL_Texture *wig_texts_textures[MAX_WIGS][MAX_WIGS];
+    SDL_Rect wig_texts_rects[MAX_WIGS][MAX_WIGS];
+    const char *wig_texts[MAX_WIGS][MAX_WIGS]; /*for debugging purposes only*/
 };
 
 /**

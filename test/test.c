@@ -19,8 +19,12 @@ int main(int argc, char *argv[]) {
 
         /*Create window widget
          * Y position has to be at-least 20 */
-        OV_createWindow(256, 144, (vec2){0, 20}, "Window 1");
-        OV_createWindow(200, 20, (vec2){700, 500}, "Window 2");
+        OV_createWindow(300, 200, (vec2){0, 20}, "Window 1");
+        OV_createWindow(300, 40, (vec2){700, 500}, "Window 2");
+
+        OV_addText("Window 1", "Hello World!");
+        OV_addText("Window 2", "Hello World!");
+        OV_addText("Window 1", "Hello Sailor!");
 
         OV_renderFrame(event);
     }

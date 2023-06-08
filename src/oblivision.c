@@ -65,6 +65,41 @@ void OV_addText(const char *window_ID, char *text) {
             break;
         }
     }
+    int j,k;
+    for(j = 0; j < MAX_WIGS; j++) {
+        if(j == wig_index) {
+            for(k = 0; k < MAX_WIGS; k++) {
+                if(wigData.wig_texts[j][k] == NULL ||
+                    wigData.wig_texts[j][k] == text) {
+
+                    wigData.wig_texts[j][k] = text;
+
+                    wigData.wig_texts_surfaces[j][k] = TTF_RenderText_Solid(winData.font, wigData.wig_texts[j][k],(SDL_Color) {0,0,0});
+                    wigData.wig_texts_textures[j][k] = SDL_CreateTextureFromSurface(winData.renderer, wigData.wig_texts_surfaces[j][k]);
+
+                    wigData.wig_texts_rects[j][k].x = wigData.wig_pos[j].x;
+
+                    if(k == 0) {
+                        wigData.wig_texts_rects[j][k].y = wigData.wig_pos[j].y;
+                    } else {
+                        wigData.wig_texts_rects[j][k].y = wigData.wig_texts_rects[j][k-1].y + 30;
+                    }
+                    wigData.wig_texts_rects[j][k].h = 30;
+                    wigData.wig_texts_rects[j][k].w = strlen(wigData.wig_texts[j][k])*(5+PIXELSPERCHAR);
+                    if(winData.ovflag == OV_DEBUG_ENABLE) {
+                        printf("[DEBUG][%s]: %s[%d]: (%d,%d)\n",
+                               wigData.names[j],
+                               wigData.wig_texts[j][k], k,
+                               wigData.wig_texts_rects[j][k].x,
+                               wigData.wig_texts_rects[j][k].y);
+                    }
+                    break;
+                }
+            }
+        } else {
+            continue;
+        }
+    }
 
 }
 
@@ -256,6 +291,18 @@ void OV_renderFrame() {
         wigData.title_rect[i].h = 20;
         SDL_RenderCopy(winData.renderer, winData.text_texture[i],
                        NULL, &wigData.title_rect[i]);
+    }
+
+    /*rendercopy all the window texts*/
+    int j,k;
+    for(j = 0; j < MAX_WIGS; j++) {
+        for(k = 0; k < MAX_WIGS; k++) {
+            if(wigData.wig_texts_textures[j][k] == NULL) {
+                break;
+            }
+            SDL_RenderCopy(winData.renderer, wigData.wig_texts_textures[j][k],
+                           NULL, &wigData.wig_texts_rects[j][k]);
+        }
     }
 
     winData.pixel_data[0] = RED;
