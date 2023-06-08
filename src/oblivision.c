@@ -256,7 +256,9 @@ void update_position(SDL_Event event) {
     }
 }
 
+Uint64 start;
 void OV_pollEvent(SDL_Event event) {
+    start = SDL_GetPerformanceCounter();
     while (SDL_PollEvent(&event) != 0) {
         if (event.type == SDL_QUIT) {
             OV_free();
@@ -267,8 +269,6 @@ void OV_pollEvent(SDL_Event event) {
 }
 
 void OV_renderFrame() {
-
-    Uint64 start = SDL_GetPerformanceCounter();
 
     load_widgets();
 
