@@ -73,6 +73,8 @@ struct windata {
     int height, width;
     int in_window;
 
+    float OV_FPS;
+
 };
 
 
@@ -137,6 +139,15 @@ int OV_createWindow(int width, int height, vec2 pos, const char *name);
  *
  * @param event SDL_Event used to poll key & mouse events as well as positions*/
 void OV_pollEvent(SDL_Event event);
+
+/**
+ * @brief Gets and returns the winData structure for all the oblivision data*/
+struct windata OV_getWindata();
+
+/**
+ * @brief Gets and returns the fps of the current window
+ */
+float OV_FPS();
 
 /**
  * @brief Renders current frame filled with pixel data

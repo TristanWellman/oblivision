@@ -37,7 +37,7 @@ void OV_setBackground(OV_COLOR bg_color) {
 }
 
 int custom_window_fill = MAX_WIGS+1;
-int current_pixel_data[];
+int current_pixel_data[1];
 void OV_fillWindowData(const char *window_ID, int pixel_data[]) {
     int i;
     for(i = 0; i < MAX_WIGS; i++) {
@@ -268,6 +268,34 @@ void OV_pollEvent(SDL_Event event) {
     }
 }
 
+struct windata OV_getWindata() {
+    return winData;
+}
+
+float OV_FPS() {
+    return winData.OV_FPS;
+}
+
+void free_OV() {
+    int k, l;
+    for(l = 0; l < MAX_WIGS; l++) {
+        if(winData.text_surface[l] != NULL) {
+            SDL_FreeSurface(winData.text_surface[l]);
+        }
+        if(winData.text_texture[l] != NULL) {
+            SDL_DestroyTexture(winData.text_texture[l]);
+        }
+        for(k = 0; k < MAX_WIGS; k++) {
+            if(wigData.wig_texts_surfaces[l][k] != NULL) {
+                SDL_FreeSurface(wigData.wig_texts_surfaces[l][k]);
+            }
+            if(wigData.wig_texts_textures[l][k] != NULL) {
+                SDL_DestroyTexture(wigData.wig_texts_textures[l][k]);
+            }
+        }
+    }
+}
+
 void OV_renderFrame() {
 
     load_widgets();
@@ -310,6 +338,7 @@ void OV_renderFrame() {
 
     Uint64 end = SDL_GetPerformanceCounter();
     float elapsed = (end - start)/(float)SDL_GetPerformanceFrequency();
+    winData.OV_FPS = (float)(1.0f/elapsed);
     //printf("FPS: %d\n", (int)(1.0f/elapsed));
     if(winData.ovflag == OV_DEBUG_ENABLE) {
         char buf[0x100];
@@ -322,6 +351,8 @@ void OV_renderFrame() {
     }
     SDL_SetRenderTarget(winData.renderer, NULL);
     SDL_RenderPresent(winData.renderer);
+
+    free_OV();
 
 }
 
