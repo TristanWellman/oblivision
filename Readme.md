@@ -55,6 +55,24 @@ Bulding requires:
 * SDL 2.26.5
 * SDL_ttf 2.20.2
 
+Just drop source files into your project.
+
+It should look like:
+```
+Project-|
+       SDL-|
+          sdl files...
+       src-|
+          oblivision.c
+          oblivision.h
+          colors.h 
+          Your project files...
+       Makefile (or prefered build method)
+       SDL2.dll (for windows)
+       SDL2_ttf.dll (for windows)
+```
+
+
 ```bash
 $ git clone https://github.com/TristanWellman/oblivision.git
 $ cd oblivision

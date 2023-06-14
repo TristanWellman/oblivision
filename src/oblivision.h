@@ -16,6 +16,7 @@
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
 
 #include "colors.h"
 
@@ -43,9 +44,21 @@ typedef struct vec2_s {
 #define MAXWID 7680
 #define MAXHEI 4320
 #define MAX_WIGS 256
+#define MAX_CTEXTS 512
+#define MAX_IMAGES 256
 /** @} OVMaximums*/
 
 #define PIXELSPERCHAR 14
+
+/**
+ * @struct OV_customFontData
+ * @brief holds information gotten from OV_addCustomFont*/
+struct OV_customFontData {
+    SDL_Texture *font_texture;
+    SDL_Surface *font_surface;
+    TTF_Font *font;
+    const char *font_file;
+};
 
 /**
  * @struct windata
@@ -61,6 +74,14 @@ struct windata {
 
     SDL_Surface *text_surface[MAX_WIGS];
     SDL_Texture *text_texture[MAX_WIGS];
+
+    SDL_Texture *custom_text_textures[MAX_CTEXTS];
+    SDL_Rect custom_text_rects[MAX_CTEXTS];
+    char *custom_texts[MAX_CTEXTS];
+
+    SDL_Texture *custom_image_textures[MAX_IMAGES];
+    SDL_Rect custom_image_rects[MAX_IMAGES];
+    const char *image_files[MAX_IMAGES];
 
     const char *fonttitle;
     TTF_Font *font;
@@ -115,6 +136,34 @@ void OV_setBackground(OV_COLOR bg_color);
  * @param pixel_data array of ints holding the data to write to the window buffer*/
 void OV_fillWindowData(const char *window_ID, int pixel_data[]);
 
+
+/**
+ * @brief load image to the screen at a specified location
+ *
+ * @param position position of the image on the screen
+ * @param image_file location to the image file
+ * @param size size of the image*/
+void OV_addImage(const char *image_file, vec2 position, vec2 size);
+
+/**
+ * @brief unloads text textures and surfaces from wthe windata struct
+ *
+ * @param text text to unload*/
+void OV_unloadCustomText(char *text);
+
+/**
+ * @brief Prints a piece of text onto a specified location of the screen with a specified font
+ *
+ * @param font font used for text to print
+ * @param text string to print to the specified location
+ * @param font_surface surface used to initialize the text
+ * @param font_texture texture used to initialize and print the text
+ * @param position specified location to print the text
+ * @param color color set for the text*/
+void OV_addCustomText(TTF_Font *font,
+                      SDL_Texture *font_texture, SDL_Surface *font_surface,
+                      vec2 position, char *text, SDL_Color color);
+
 /**
  * @brief Prints a piece of text onto the specified window
  * @note Oblivision should be initialized prior to OV_addText
@@ -141,10 +190,6 @@ int OV_createWindow(int width, int height, vec2 pos, const char *name);
 void OV_pollEvent(SDL_Event event);
 
 /**
- * @brief Gets and returns the winData structure for all the oblivision data*/
-struct windata OV_getWindata();
-
-/**
  * @brief Gets and returns the fps of the current window
  */
 float OV_FPS();
@@ -160,6 +205,12 @@ void OV_renderFrame();
  *
  * @param flag flag(s) used to initialize an Oblivision program*/
 void OV_setFlags(int flag);
+
+/**
+ * @brief Add a font to oblivision and be able to add text to the screen with OV_customFontData
+ *
+ * @param font_file file name for the font file*/
+struct OV_customFontData OV_addCustomFont(const char *font_file, int font_size);
 
 /**
  * @brief Sets the font to the specified ttf/ttc file name

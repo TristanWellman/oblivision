@@ -24,7 +24,7 @@ void OV_colorTest() {
 
 void OV_setBackground(OV_COLOR bg_color) {
     winData.bg_color = bg_color;
-    if (winData.pixel_data[0] != RED) {
+    if ((unsigned int)winData.pixel_data[0] != RED) {
         for (current_x = 0; current_x < winData.width; current_x++) {
             for (current_y = 0; current_y < winData.height; current_y++) {
                 winData.pixel_data[current_y * winData.width + current_x] = bg_color.color;
@@ -50,8 +50,89 @@ void OV_fillWindowData(const char *window_ID, int pixel_data[]) {
         printf("ERROR:: %s: Wrong window ID!\n", window_ID);
     } else {
         int j;
-        for(j = 0; j < sizeof(*pixel_data); j++) {
+        for(j = 0; (unsigned int)j < sizeof(*pixel_data); j++) {
             current_pixel_data[j] = pixel_data[j];
+        }
+    }
+}
+
+void OV_addImage(const char *image_file, vec2 position, vec2 size) {
+    SDL_Surface *image_surface = IMG_Load(image_file);
+    if(image_surface == NULL) {
+        printf("FATAL:: Could not load image: %s\n", image_file);
+        exit(1);
+    }
+
+    SDL_Texture *tempt = SDL_CreateTextureFromSurface(winData.renderer,
+                                                      image_surface);;
+
+    int i;
+    for(i = 0; i < MAX_IMAGES; i++) {
+        if(winData.custom_image_textures[i] != NULL) {
+            if(strcmp(winData.image_files[i], image_file) == 0) {
+                break;
+            }
+        }
+        if(winData.custom_image_textures[i] == NULL) {
+            winData.image_files[i] = image_file;
+            winData.custom_image_textures[i] = SDL_CreateTextureFromSurface(winData.renderer,
+                                                                            image_surface);;
+
+            winData.custom_image_rects[i].x = position.x;
+            winData.custom_image_rects[i].y = position.y;
+            winData.custom_image_rects[i].w = size.x;
+            winData.custom_image_rects[i].h = size.y;
+
+            printf("[DEBUG]: Image loaded: [%d]%s\n", i, image_file);
+            break;
+        }
+    }
+    SDL_FreeSurface(image_surface);
+    SDL_DestroyTexture(tempt);
+}
+
+void OV_addCustomText(TTF_Font *font,
+                      SDL_Texture *font_texture, SDL_Surface *font_surface,
+                      vec2 position, char *text, SDL_Color color) {
+
+    font_surface = TTF_RenderText_Solid(font, text, color);
+    font_texture = SDL_CreateTextureFromSurface(winData.renderer, font_surface);
+    SDL_Rect custom_rect;
+    custom_rect.x = position.x;
+    custom_rect.y = position.y;
+
+    custom_rect.h = 24;
+    custom_rect.w = strlen(text)*(5+PIXELSPERCHAR);
+
+    int i;
+    for(i = 0; i < MAX_CTEXTS; i++) {
+        if(winData.custom_text_textures[i] != NULL) {
+            if(strcmp(winData.custom_texts[i], text) == 0) {
+                break;
+            }
+        }
+        if(winData.custom_text_textures[i] == NULL) {
+            winData.custom_texts[i] = text;
+            winData.custom_text_textures[i] = SDL_CreateTextureFromSurface(winData.renderer, font_surface);;
+            winData.custom_text_rects[i] = custom_rect;
+            printf("[DEBUG]: Custom text loaded: [%d]\"%s\"\n", i, text);
+            break;
+        }
+    }
+    SDL_FreeSurface(font_surface);
+    SDL_DestroyTexture(font_texture);
+}
+
+void OV_unloadCustomText(char *text) {
+    int i;
+    for(i = 0; i < MAX_CTEXTS; i++) {
+        if(winData.custom_texts[i] == NULL) {
+            break;
+        }
+        if(strcmp(winData.custom_texts[i], text) == 0) {
+            winData.custom_texts[i] = NULL;
+            winData.custom_text_textures[i] = NULL;
+            break;
         }
     }
 }
@@ -74,7 +155,7 @@ void OV_addText(const char *window_ID, char *text) {
 
                     wigData.wig_texts[j][k] = text;
 
-                    wigData.wig_texts_surfaces[j][k] = TTF_RenderText_Solid(winData.font, wigData.wig_texts[j][k],(SDL_Color) {0,0,0});
+                    wigData.wig_texts_surfaces[j][k] = TTF_RenderText_Solid(winData.font, wigData.wig_texts[j][k],(SDL_Color) {0,0,0,255});
                     wigData.wig_texts_textures[j][k] = SDL_CreateTextureFromSurface(winData.renderer, wigData.wig_texts_surfaces[j][k]);
 
                     wigData.wig_texts_rects[j][k].x = wigData.wig_pos[j].x;
@@ -106,7 +187,7 @@ void OV_addText(const char *window_ID, char *text) {
 int OV_createWindow(int width, int height, vec2 pos, const char *name) {
 
     int i;
-    for(i = 0; i < sizeof(wigData.names); i++) {
+    for(i = 0; (unsigned int)i < sizeof(wigData.names); i++) {
         if(wigData.names[i] == name) {
             return 1;
         }
@@ -130,7 +211,7 @@ void load_widgets() {
     current_x = 0;
     current_y = 0;
     int x2,y2;
-    for(i = 0; i < sizeof(wigData.names); i++) {
+    for(i = 0; (unsigned int)i < sizeof(wigData.names); i++) {
         if(wigData.names[i] == NULL) {
             break;
         }
@@ -158,7 +239,7 @@ void load_widgets() {
                      /*make title bar*/
                      vec2 bar_pos = {wigData.wig_pos[i].x, wigData.wig_pos[i].y-20};
                      vec2 bar_size = {wigData.wig_sizes[i].x, 20};
-                     int x3,y3,x4,y4;
+                     int x3,y3;
 
                      for(x3 = bar_pos.x; x3 < (bar_pos.x + bar_size.x); x3++) {
                          for(y3 = bar_pos.y; y3 < (bar_pos.y + bar_size.y); y3++) {
@@ -172,7 +253,7 @@ void load_widgets() {
         /*Load bar title*/
         winData.text_surface[i] = TTF_RenderText_Blended(winData.font,
                                                        wigData.names[i],
-                                                       (SDL_Color){255,255,255});
+                                                       (SDL_Color){255,255,255,255});
         winData.text_texture[i] = SDL_CreateTextureFromSurface(winData.renderer, winData.text_surface[i]);
     }
 }
@@ -199,7 +280,7 @@ void unload_widget(int widget_offset) {
                 /*make title bar*/
                 vec2 bar_pos = {wigData.wig_pos[widget_offset].x, wigData.wig_pos[widget_offset].y-20};
                 vec2 bar_size = {wigData.wig_sizes[widget_offset].x, 20};
-                int x3,y3,x4,y4;
+                int x3,y3;
 
                 for(x3 = bar_pos.x; x3 < (bar_pos.x + bar_size.x); x3++) {
                     for(y3 = bar_pos.y; y3 < (bar_pos.y + bar_size.y); y3++) {
@@ -237,12 +318,12 @@ void update_position(SDL_Event event) {
         //printf("%d\n", winData.in_window);
     }
     if(event.type == SDL_MOUSEBUTTONUP) {
-        vec2 prev_wiv_pos;
+        //vec2 prev_wiv_pos;
         //printf("%d\n", winData.in_window);
         for(i = 0; i < MAX_WIGS; i++) {
             if(i == winData.in_window) {
-                prev_wiv_pos.x = wigData.wig_pos[i].x;
-                prev_wiv_pos.y = wigData.wig_pos[i].y;
+                //prev_wiv_pos.x = wigData.wig_pos[i].x;
+                //prev_wiv_pos.y = wigData.wig_pos[i].y;
                 unload_widget(i);
                 if(mouse_pos.y < 20) {
                     mouse_pos.y = 20;
@@ -268,10 +349,6 @@ void OV_pollEvent(SDL_Event event) {
     }
 }
 
-struct windata OV_getWindata() {
-    return winData;
-}
-
 float OV_FPS() {
     return winData.OV_FPS;
 }
@@ -294,6 +371,19 @@ void free_OV() {
             }
         }
     }
+    /* int i,j;
+    for(i = 0; i < MAX_CTEXTS; i++) {
+        if(winData.custom_text_textures[i] == NULL) {
+            break;
+        }
+        SDL_DestroyTexture(winData.custom_text_textures[i]);
+    }
+    for(j = 0; j < MAX_IMAGES; j++) {
+        if(winData.custom_image_textures[j] == NULL) {
+            break;
+        }
+        SDL_DestroyTexture(winData.custom_image_textures[j]);
+    }*/
 }
 
 void OV_renderFrame() {
@@ -306,7 +396,28 @@ void OV_renderFrame() {
                       winData.pixel_data, winData.width * 4);
 
     SDL_RenderCopy(winData.renderer, winData.texture,
-            NULL, NULL);
+                   NULL, NULL);
+
+    /*images are first*/
+    int m;
+    for(m = 0; m < MAX_IMAGES; m++) {
+        if(winData.custom_image_textures[m] == NULL) {
+            break;
+        }
+        SDL_RenderCopy(winData.renderer, winData.custom_image_textures[m],
+                       NULL, &winData.custom_image_rects[m]);
+    }
+
+    /*rendercopy custom texts*/
+    int l;
+    for(l = 0; l < MAX_CTEXTS; l++) {
+        if(winData.custom_text_textures[l] == NULL /*||
+            winData.custom_text_rects[l] == NULL*/) {
+            break;
+        }
+        SDL_RenderCopy(winData.renderer, winData.custom_text_textures[l],
+                       NULL, &winData.custom_text_rects[l]);
+    }
 
     int i;
     for(i = 0; i < MAX_WIGS; i++) {
@@ -344,7 +455,7 @@ void OV_renderFrame() {
         char buf[0x100];
         snprintf(buf, sizeof(buf), "FPS: %d", (int) (1.0f / elapsed));
         SDL_Surface *fps_surface = TTF_RenderText_Blended(winData.font, buf,
-                                                        (SDL_Color) {255, 75, 75});
+                                                        (SDL_Color) {255,75,75,255});
         SDL_Texture *fps_texture = SDL_CreateTextureFromSurface(winData.renderer, fps_surface);
         SDL_Rect fps_rect = {0, winData.height - 24, 100, 20};
         SDL_RenderCopy(winData.renderer, fps_texture, NULL, &fps_rect);
@@ -361,6 +472,23 @@ void OV_setFlags(int flag) {
         winData.ovflag = flag;
     }
 }
+
+struct OV_customFontData customFontData;
+struct OV_customFontData OV_addCustomFont(const char *font_file, int font_size) {
+
+    /*clear if used multiple times*/
+    customFontData.font_file = NULL;
+    customFontData.font = NULL;
+
+    customFontData.font_file = font_file;
+    customFontData.font = TTF_OpenFont(customFontData.font_file, font_size);
+    if(customFontData.font == NULL) {
+        printf("FATAL:: Could not load font: %s\n", font_file);
+        exit(1);
+    }
+    return customFontData;
+}
+
 void OV_setFont(const char *font) {
     winData.fonttitle = font;
 }
@@ -397,7 +525,7 @@ int OVInit(SDL_Window *window, int width, int height, const char *winname) {
             );*/
 
     winData.renderer = SDL_CreateRenderer(winData.window, -1,
-                                          SDL_RENDERER_PRESENTVSYNC);
+                                          SDL_RENDERER_ACCELERATED);
     if(winData.renderer == NULL) {
         printf("FATAL:: Could not init renderer!\n");
         exit(1);
@@ -423,8 +551,13 @@ int OVInit(SDL_Window *window, int width, int height, const char *winname) {
         exit(1);
     }
 
-    int i,j,k;
-    for(i = 0; i < sizeof(winData.pixel_data); i++) {
+    if (IMG_Init(IMG_INIT_PNG) == 0) {
+        printf("FATAL:: Could not init SDL_image!\n");
+        exit(1);
+    }
+
+    int i;
+    for(i = 0; (unsigned int)i < sizeof(winData.pixel_data); i++) {
         if (i >= winData.width * winData.height) {
             break;
         }
