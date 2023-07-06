@@ -91,6 +91,20 @@ void OV_addImage(const char *image_file, vec2 position, vec2 size) {
     SDL_DestroyTexture(tempt);
 }
 
+void OV_unloadImage(const char *image_file) {
+    int i;
+    for(i = 0; i < MAX_IMAGES; i++) {
+        if(winData.image_files[i] == NULL) {
+            break;
+        }
+        if(strcmp(winData.image_files[i], image_file) == 0) {
+            winData.image_files[i] = NULL;
+            winData.custom_image_textures[i] = NULL;
+            break;
+        }
+    }
+}
+
 void OV_addCustomText(TTF_Font *font,
                       SDL_Texture *font_texture, SDL_Surface *font_surface,
                       vec2 position, char *text, SDL_Color color) {

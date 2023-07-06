@@ -13,6 +13,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdint.h>
+
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -144,6 +145,12 @@ void OV_fillWindowData(const char *window_ID, int pixel_data[]);
  * @param image_file location to the image file
  * @param size size of the image*/
 void OV_addImage(const char *image_file, vec2 position, vec2 size);
+
+/**
+ * @brief unloads image textures from windata
+ *
+ * @param image_file image to unload*/
+void OV_unloadImage(const char *image_file);
 
 /**
  * @brief unloads text textures and surfaces from wthe windata struct
