@@ -17,12 +17,16 @@
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+
+#ifndef OV_SDL_IMAGE
 #include <SDL2/SDL_image.h>
+#endif
 
 #include "colors.h"
 
 
 #define OV_DEBUG_ENABLE 1
+#define OV_OPENGL_ENABLE 2
 
 /**
  * @typedef OV_COLOR
@@ -67,6 +71,7 @@ struct OV_customFontData {
 struct windata {
 
     int ovflag;
+    int opengl_enabled;
     SDL_Window *window;
     SDL_Renderer *renderer;
 

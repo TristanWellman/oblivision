@@ -8,7 +8,7 @@ LFLAGS= -L "$(BIN)" -loblivision \
 	-L "SDL/lib" -lSDL2 -L "SDL_ttf/lib" -lSDL2_ttf
 
 CFLAGS_MAC= -g -I /opt/local/include
-LFLAGS_MAC= -L/opt/local/lib -lSDL2 -lSDL2_ttf -lSDL2_image -L "$(BIN)" -loblivision
+LFLAGS_MAC= -L/opt/local/lib -lSDL2 -lSDL2_ttf -lSDL2_image
 
 COMMON_C= src/oblivision.c
 COMMON_O= oblivision.o

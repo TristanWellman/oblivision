@@ -172,12 +172,22 @@ void OV_addText(const char *window_ID, char *text) {
                     wigData.wig_texts_surfaces[j][k] = TTF_RenderText_Solid(winData.font, wigData.wig_texts[j][k],(SDL_Color) {0,0,0,255});
                     wigData.wig_texts_textures[j][k] = SDL_CreateTextureFromSurface(winData.renderer, wigData.wig_texts_surfaces[j][k]);
 
-                    wigData.wig_texts_rects[j][k].x = wigData.wig_pos[j].x;
-
-                    if(k == 0) {
-                        wigData.wig_texts_rects[j][k].y = wigData.wig_pos[j].y;
+                    int l;
+                    if(wigData.wig_texts_rects[j][k].x != 0 && wigData.wig_texts_rects[j][k].y != 0) {
+                        for(l = k; l < MAX_WIGS; l++) {
+                            if(wigData.wig_texts_rects[j][k].x == 0 && wigData.wig_texts_rects[j][k].y == 0) {
+                                k = l;
+                                break;
+                            }
+                        }
                     } else {
-                        wigData.wig_texts_rects[j][k].y = wigData.wig_texts_rects[j][k-1].y + 30;
+                        wigData.wig_texts_rects[j][k].x = wigData.wig_pos[j].x;
+
+                        if(k == 0) {
+                            wigData.wig_texts_rects[j][k].y = wigData.wig_pos[j].y;
+                        } else {
+                            wigData.wig_texts_rects[j][k].y = wigData.wig_texts_rects[j][k-1].y + 30;
+                        }
                     }
                     wigData.wig_texts_rects[j][k].h = 30;
                     wigData.wig_texts_rects[j][k].w = strlen(wigData.wig_texts[j][k])*(5+PIXELSPERCHAR);
@@ -482,8 +492,11 @@ void OV_renderFrame() {
 }
 
 void OV_setFlags(int flag) {
-    if(flag != 0) {
+    if(flag == OV_DEBUG_ENABLE) {
         winData.ovflag = flag;
+    }
+    if(flag == OV_OPENGL_ENABLE) {
+        winData.opengl_enabled = 1;
     }
 }
 
@@ -559,7 +572,7 @@ int OVInit(SDL_Window *window, int width, int height, const char *winname) {
         printf("FATAL:: Could not init TTF!\n");
         exit(1);
     }
-    winData.font = TTF_OpenFont(winData.fonttitle, 24);
+    winData.font = TTF_OpenFont(winData.fonttitle, 20);
     if(winData.font == NULL) {
         printf("FATAL:: Could not load font!\n");
         exit(1);
