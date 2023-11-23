@@ -56,7 +56,7 @@ void OV_fillWindowData(const char *window_ID, int pixel_data[]) {
     }
 }
 
-void OV_addImage(const char *image_file, vec2 position, vec2 size) {
+void OV_addImage(const char *image_file, OV_vec2 position, OV_vec2 size) {
     SDL_Surface *image_surface = IMG_Load(image_file);
     if(image_surface == NULL) {
         printf("FATAL:: Could not load image: %s\n", image_file);
@@ -83,7 +83,7 @@ void OV_addImage(const char *image_file, vec2 position, vec2 size) {
             winData.custom_image_rects[i].w = size.x;
             winData.custom_image_rects[i].h = size.y;
 
-            printf("[DEBUG]: Image loaded: [%d]%s\n", i, image_file);
+            log_debug("Image loaded: [%d]%s\n", i, image_file);
             break;
         }
     }
@@ -107,7 +107,7 @@ void OV_unloadImage(const char *image_file) {
 
 void OV_addCustomText(TTF_Font *font,
                       SDL_Texture *font_texture, SDL_Surface *font_surface,
-                      vec2 position, char *text, SDL_Color color) {
+                      OV_vec2 position, char *text, SDL_Color color) {
 
     font_surface = TTF_RenderText_Solid(font, text, color);
     font_texture = SDL_CreateTextureFromSurface(winData.renderer, font_surface);
@@ -129,7 +129,7 @@ void OV_addCustomText(TTF_Font *font,
             winData.custom_texts[i] = text;
             winData.custom_text_textures[i] = SDL_CreateTextureFromSurface(winData.renderer, font_surface);;
             winData.custom_text_rects[i] = custom_rect;
-            printf("[DEBUG]: Custom text loaded: [%d]\"%s\"\n", i, text);
+            log_debug("Custom text loaded: [%d]\"%s\"\n", i, text);
             break;
         }
     }
@@ -172,27 +172,17 @@ void OV_addText(const char *window_ID, char *text) {
                     wigData.wig_texts_surfaces[j][k] = TTF_RenderText_Solid(winData.font, wigData.wig_texts[j][k],(SDL_Color) {0,0,0,255});
                     wigData.wig_texts_textures[j][k] = SDL_CreateTextureFromSurface(winData.renderer, wigData.wig_texts_surfaces[j][k]);
 
-                    int l;
-                    if(wigData.wig_texts_rects[j][k].x != 0 && wigData.wig_texts_rects[j][k].y != 0) {
-                        for(l = k; l < MAX_WIGS; l++) {
-                            if(wigData.wig_texts_rects[j][k].x == 0 && wigData.wig_texts_rects[j][k].y == 0) {
-                                k = l;
-                                break;
-                            }
-                        }
-                    } else {
-                        wigData.wig_texts_rects[j][k].x = wigData.wig_pos[j].x;
+                    wigData.wig_texts_rects[j][k].x = wigData.wig_pos[j].x;
 
-                        if(k == 0) {
-                            wigData.wig_texts_rects[j][k].y = wigData.wig_pos[j].y;
-                        } else {
-                            wigData.wig_texts_rects[j][k].y = wigData.wig_texts_rects[j][k-1].y + 30;
-                        }
+                    if(k == 0) {
+                        wigData.wig_texts_rects[j][k].y = wigData.wig_pos[j].y;
+                    } else {
+                        wigData.wig_texts_rects[j][k].y = wigData.wig_texts_rects[j][k-1].y + 30;
                     }
-                    wigData.wig_texts_rects[j][k].h = 30;
-                    wigData.wig_texts_rects[j][k].w = strlen(wigData.wig_texts[j][k])*(5+PIXELSPERCHAR);
+                    wigData.wig_texts_rects[j][k].h = 20;
+                    wigData.wig_texts_rects[j][k].w = strlen(wigData.wig_texts[j][k])*(PIXELSPERCHAR);
                     if(winData.ovflag == OV_DEBUG_ENABLE) {
-                        printf("[DEBUG][%s]: %s[%d]: (%d,%d)\n",
+                        log_debug("[%s]: %s[%d]: (%d,%d)\n",
                                wigData.names[j],
                                wigData.wig_texts[j][k], k,
                                wigData.wig_texts_rects[j][k].x,
@@ -208,7 +198,11 @@ void OV_addText(const char *window_ID, char *text) {
 
 }
 
-int OV_createWindow(int width, int height, vec2 pos, const char *name) {
+void OV_createButton(const char *window_ID, const char *button_ID) {
+
+}
+
+int OV_createWindow(int width, int height, OV_vec2 pos, const char *name) {
 
     int i;
     for(i = 0; (unsigned int)i < sizeof(wigData.names); i++) {
@@ -221,7 +215,7 @@ int OV_createWindow(int width, int height, vec2 pos, const char *name) {
                 pos.y = 20;
             }
             wigData.wig_pos[i] = pos;
-            wigData.wig_sizes[i] = (vec2){width, height};
+            wigData.wig_sizes[i] = (OV_vec2){width, height};
             printf("[%d]%s: (%d,%d)\n", i, name, wigData.wig_pos[i].x, wigData.wig_pos[i].y);
             break;
         }
@@ -261,8 +255,8 @@ void load_widgets() {
                          }
                      }
                      /*make title bar*/
-                     vec2 bar_pos = {wigData.wig_pos[i].x, wigData.wig_pos[i].y-20};
-                     vec2 bar_size = {wigData.wig_sizes[i].x, 20};
+                     OV_vec2 bar_pos = {wigData.wig_pos[i].x, wigData.wig_pos[i].y-20};
+                     OV_vec2 bar_size = {wigData.wig_sizes[i].x, 20};
                      int x3,y3;
 
                      for(x3 = bar_pos.x; x3 < (bar_pos.x + bar_size.x); x3++) {
@@ -302,8 +296,8 @@ void unload_widget(int widget_offset) {
                     }
                 }
                 /*make title bar*/
-                vec2 bar_pos = {wigData.wig_pos[widget_offset].x, wigData.wig_pos[widget_offset].y-20};
-                vec2 bar_size = {wigData.wig_sizes[widget_offset].x, 20};
+                OV_vec2 bar_pos = {wigData.wig_pos[widget_offset].x, wigData.wig_pos[widget_offset].y-20};
+                OV_vec2 bar_size = {wigData.wig_sizes[widget_offset].x, 20};
                 int x3,y3;
 
                 for(x3 = bar_pos.x; x3 < (bar_pos.x + bar_size.x); x3++) {
@@ -319,7 +313,7 @@ void unload_widget(int widget_offset) {
 
 int in_window = MAX_WIGS+1;
 void update_position(SDL_Event event) {
-    vec2 mouse_pos;
+    OV_vec2 mouse_pos;
     int i, j, k;
 
     SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
@@ -395,22 +389,9 @@ void free_OV() {
             }
         }
     }
-    /* int i,j;
-    for(i = 0; i < MAX_CTEXTS; i++) {
-        if(winData.custom_text_textures[i] == NULL) {
-            break;
-        }
-        SDL_DestroyTexture(winData.custom_text_textures[i]);
-    }
-    for(j = 0; j < MAX_IMAGES; j++) {
-        if(winData.custom_image_textures[j] == NULL) {
-            break;
-        }
-        SDL_DestroyTexture(winData.custom_image_textures[j]);
-    }*/
 }
 
-void OV_renderFrame() {
+void OV_renderFrame(SDL_Texture *oglTexture, uint32_t *oglPixBuf) {
 
     load_widgets();
 
@@ -422,6 +403,12 @@ void OV_renderFrame() {
     SDL_RenderCopy(winData.renderer, winData.texture,
                    NULL, NULL);
 
+    if(winData.opengl_enabled == 1) {
+        oglTexture = SDL_CreateTexture(winData.renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, winData.width, winData.height);
+        SDL_UpdateTexture(oglTexture, NULL,
+            oglPixBuf, winData.width * sizeof(uint32_t));
+        SDL_RenderCopy(winData.renderer,oglTexture,NULL,NULL);
+    }
     /*images are first*/
     int m;
     for(m = 0; m < MAX_IMAGES; m++) {
@@ -469,7 +456,7 @@ void OV_renderFrame() {
     }
 
     winData.pixel_data[0] = RED;
-    SDL_Delay(38);
+    //SDL_Delay(38);
 
     Uint64 end = SDL_GetPerformanceCounter();
     float elapsed = (end - start)/(float)SDL_GetPerformanceFrequency();
@@ -484,9 +471,11 @@ void OV_renderFrame() {
         SDL_Rect fps_rect = {0, winData.height - 24, 100, 20};
         SDL_RenderCopy(winData.renderer, fps_texture, NULL, &fps_rect);
     }
+
     SDL_SetRenderTarget(winData.renderer, NULL);
     SDL_RenderPresent(winData.renderer);
 
+    if(winData.opengl_enabled == 1) SDL_DestroyTexture(oglTexture);
     free_OV();
 
 }
@@ -497,6 +486,7 @@ void OV_setFlags(int flag) {
     }
     if(flag == OV_OPENGL_ENABLE) {
         winData.opengl_enabled = 1;
+#define OV_OGL 1
     }
 }
 
@@ -510,7 +500,7 @@ struct OV_customFontData OV_addCustomFont(const char *font_file, int font_size) 
     customFontData.font_file = font_file;
     customFontData.font = TTF_OpenFont(customFontData.font_file, font_size);
     if(customFontData.font == NULL) {
-        printf("FATAL:: Could not load font: %s\n", font_file);
+        log_fatal("FATAL:: Could not load font: %s\n", font_file);
         exit(1);
     }
     return customFontData;
@@ -532,27 +522,27 @@ int OVInit(SDL_Window *window, int width, int height, const char *winname) {
 
 
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
-        printf("FATAL:: Could not init SDL2_ttf!\n");
+        log_fatal("Could not init SDL2_ttf!\n");
         exit(1);
     }
 
-    winData.window = SDL_CreateWindow(
-            winname,
-            SDL_WINDOWPOS_CENTERED_DISPLAY(0),
-            SDL_WINDOWPOS_CENTERED_DISPLAY(0),
-            winData.width, winData.height, 0);
+        winData.window = SDL_CreateWindow(
+                winname,
+                SDL_WINDOWPOS_CENTERED_DISPLAY(0),
+                SDL_WINDOWPOS_CENTERED_DISPLAY(0),
+                winData.width, winData.height, 0);
 
     if(winData.window == NULL) {
-        printf("FATAL:: Could not set video mode!\n");
+        log_fatal("Could not set video mode!\n");
         exit(1);
     }
 /*
     winData.pixel_data = (char *)malloc(
             sizeof(char *)*(winData.width * winData.height)
             );*/
-
     winData.renderer = SDL_CreateRenderer(winData.window, -1,
                                           SDL_RENDERER_ACCELERATED);
+
     if(winData.renderer == NULL) {
         printf("FATAL:: Could not init renderer!\n");
         exit(1);
@@ -572,10 +562,19 @@ int OVInit(SDL_Window *window, int width, int height, const char *winname) {
         printf("FATAL:: Could not init TTF!\n");
         exit(1);
     }
-    winData.font = TTF_OpenFont(winData.fonttitle, 20);
-    if(winData.font == NULL) {
-        printf("FATAL:: Could not load font!\n");
-        exit(1);
+    if(winData.fonttitle == NULL) {
+        /*official font for oblivision*/
+        winData.font = TTF_OpenFont("iosevka.ttc", 24);
+        if(winData.font == NULL) {
+            printf("FATAL:: Could not load font!\n");
+            exit(1);
+        }
+    } else {
+        winData.font = TTF_OpenFont(winData.fonttitle, 24);
+        if(winData.font == NULL) {
+            printf("FATAL:: Could not load font!\n");
+            exit(1);
+        }
     }
 
     if (IMG_Init(IMG_INIT_PNG) == 0) {
@@ -590,7 +589,6 @@ int OVInit(SDL_Window *window, int width, int height, const char *winname) {
         }
         winData.pixel_data[i] = 0;
     }
-
     return 0;
 
 }

@@ -23,6 +23,11 @@
 #endif
 
 #include "colors.h"
+#include "log.h"
+
+//#ifdef OV_OPENGL
+
+//#endif
 
 
 #define OV_DEBUG_ENABLE 1
@@ -40,7 +45,7 @@ typedef struct color_s {
  * @brief Vector data for things like window position/sizes*/
 typedef struct vec2_s {
     int x, y;
-} vec2;
+} OV_vec2;
 
 /**
  * @defgroup OVMaximums
@@ -53,7 +58,7 @@ typedef struct vec2_s {
 #define MAX_IMAGES 256
 /** @} OVMaximums*/
 
-#define PIXELSPERCHAR 14
+#define PIXELSPERCHAR 13
 
 /**
  * @struct OV_customFontData
@@ -104,6 +109,12 @@ struct windata {
 
 };
 
+/**
+ * @struct buttondata
+ * @brief Structure to hold all the button data.*/
+struct buttondata {
+
+};
 
 /**
  * @struct widget_data
@@ -111,8 +122,8 @@ struct windata {
 struct widget_data {
     int num_wigs;
     const char *names[MAX_WIGS];
-    vec2 wig_sizes[MAX_WIGS];
-    vec2 wig_pos[MAX_WIGS];
+    OV_vec2 wig_sizes[MAX_WIGS];
+    OV_vec2 wig_pos[MAX_WIGS];
 
     SDL_Rect title_rect[MAX_WIGS];
 
@@ -120,6 +131,8 @@ struct widget_data {
     SDL_Texture *wig_texts_textures[MAX_WIGS][MAX_WIGS];
     SDL_Rect wig_texts_rects[MAX_WIGS][MAX_WIGS];
     const char *wig_texts[MAX_WIGS][MAX_WIGS]; /*for debugging purposes only*/
+
+    struct buttondata buttons;
 };
 
 /**
@@ -149,7 +162,7 @@ void OV_fillWindowData(const char *window_ID, int pixel_data[]);
  * @param position position of the image on the screen
  * @param image_file location to the image file
  * @param size size of the image*/
-void OV_addImage(const char *image_file, vec2 position, vec2 size);
+void OV_addImage(const char *image_file, OV_vec2 position, OV_vec2 size);
 
 /**
  * @brief unloads image textures from windata
@@ -174,7 +187,7 @@ void OV_unloadCustomText(char *text);
  * @param color color set for the text*/
 void OV_addCustomText(TTF_Font *font,
                       SDL_Texture *font_texture, SDL_Surface *font_surface,
-                      vec2 position, char *text, SDL_Color color);
+                      OV_vec2 position, char *text, SDL_Color color);
 
 /**
  * @brief Prints a piece of text onto the specified window
@@ -192,7 +205,7 @@ void OV_addText(const char *window_ID, char *text);
  * @param height the desired height of the window
  * @param pos vector holding the x & y position for the OV window;
  * @param name name initialized as an ID with the window*/
-int OV_createWindow(int width, int height, vec2 pos, const char *name);
+int OV_createWindow(int width, int height, OV_vec2 pos, const char *name);
 
 /**
  * @brief runs the SDL event poll loop to register key events and update window positions
@@ -209,7 +222,7 @@ float OV_FPS();
 /**
  * @brief Renders current frame filled with pixel data
  * @note Oblivision should be initialized prior to OV_renderFrame*/
-void OV_renderFrame();
+void OV_renderFrame(SDL_Texture *oglTexture, uint32_t *oglPixBuf);
 
 /**
  * @brief Sets the initialization flags used in the Oblivision program; ex: debugging.
