@@ -64,7 +64,7 @@ void OV_addImage(const char *image_file, OV_vec2 position, OV_vec2 size) {
     }
 
     SDL_Texture *tempt = SDL_CreateTextureFromSurface(winData.renderer,
-                                                      image_surface);;
+                                                      image_surface);
 
     int i;
     for(i = 0; i < MAX_IMAGES; i++) {
@@ -372,7 +372,7 @@ float OV_FPS() {
 }
 
 void free_OV() {
-    int k, l;
+    int k,l;
     for(l = 0; l < MAX_WIGS; l++) {
         if(winData.text_surface[l] != NULL) {
             SDL_FreeSurface(winData.text_surface[l]);
@@ -470,6 +470,8 @@ void OV_renderFrame(SDL_Texture *oglTexture, uint32_t *oglPixBuf) {
         SDL_Texture *fps_texture = SDL_CreateTextureFromSurface(winData.renderer, fps_surface);
         SDL_Rect fps_rect = {0, winData.height - 24, 100, 20};
         SDL_RenderCopy(winData.renderer, fps_texture, NULL, &fps_rect);
+        SDL_FreeSurface(fps_surface);
+        SDL_DestroyTexture(fps_texture);
     }
 
     SDL_SetRenderTarget(winData.renderer, NULL);
