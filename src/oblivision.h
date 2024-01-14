@@ -211,6 +211,15 @@ void OV_addCustomText(TTF_Font *font,
  * @param text text to print into the window*/
 void OV_addText(const char *window_ID, char *text);
 
+
+/**
+ * @brief creates a new button object inside your widget(window)
+ *
+ * @param window_ID the string that holds the given window name matching to its ID.
+ * @param button_ID the string thaty holds the given button name matching to its ID
+ * @param pos x and y coordinates for the button on the widget.*/
+void OV_createButton(const char *window_ID, const char *button_ID, OV_vec2 pos);
+
 /**
  * @brief Initializes and creates an Oblivision window.
  * @note Oblivision should be initialized prior to OV_createWindow

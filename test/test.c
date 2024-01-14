@@ -26,6 +26,7 @@ int main(int argc, char *argv[]) {
         OV_addText("Window 2", "Hello World!");
         OV_addText("Window 1", "Hello Sailor!");
 
+		OV_createButton("Window 1", "Press Me", (OV_vec2){0,0});
         OV_renderFrame(NULL,NULL);
     }
 

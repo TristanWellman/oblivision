@@ -203,11 +203,19 @@ void OV_createButton(const char *window_ID, const char *button_ID, OV_vec2 pos) 
     int buttonHeight = 50;
     int i,j;
     for(i=0;i<MAX_WIGS;i++) {
-        if(wigData.names[i] == window_ID) {
-            for(j=0;j<MAX_WIGS;j++) {
-                //if(wigData.buttons.button_names[i][j] == NULL)
-            }
-            break;
+		if(wigData.names[i] == window_ID) {
+			for(j=0;j<MAX_WIGS;j++) {
+				int l=0;
+				char buf[256];
+				strcpy(buf,button_ID);
+				if(buf == wigData.buttons.button_names[i][j]) {
+					snprintf(buf, sizeof(buf), "%s:%d",button_ID,l);
+					strcpy((char *)button_ID,buf);
+					l++;
+				}
+			}
+			OV_addText(window_ID, (char *)button_ID);
+			break;
         }
     }
 
@@ -364,7 +372,7 @@ void update_position(SDL_Event event) {
                 }
                 wigData.wig_pos[i].x = mouse_pos.x;
                 wigData.wig_pos[i].y = mouse_pos.y;
-
+				winData.in_window = MAX_WIGS+1;
                 break;
             }
         }
