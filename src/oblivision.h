@@ -29,6 +29,8 @@
 
 //#endif
 
+#define ARRLEN(x) \
+		(sizeof(x)/sizeof(x[0]))
 
 #define OV_DEBUG_ENABLE 1
 #define OV_OPENGL_ENABLE 2
@@ -70,6 +72,16 @@ struct OV_customFontData {
     const char *font_file;
 };
 
+
+/**
+ * @struct winDataOpt
+ * @brief Structure used to hold buffers for optimization purposes*/
+struct windataopt {
+	OV_vec2 wigPosBack[MAX_WIGS];
+	SDL_Texture *wigTextsBack[MAX_WIGS][MAX_WIGS];
+	int pixelDataBack[MAXWID*MAXHEI];
+};
+
 /**
  * @struct windata
  * @brief Main structure for managing all pixel data, textures, sizes, etc.*/
@@ -107,12 +119,14 @@ struct windata {
 
     float OV_FPS;
 
+	struct windataopt opt;
 };
 
 /**
  * @struct buttondata
  * @brief Structure to hold all the button data.*/
 struct buttondata {
+    char *button_names[MAX_WIGS][MAX_WIGS];
 
 };
 

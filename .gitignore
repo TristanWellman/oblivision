@@ -2,3 +2,8 @@ doc/html
 doc/latex
 doc/doxy.conf
 include
+.idea
+.DS_Store
+src/*.swp
+*.o
+*.ttc

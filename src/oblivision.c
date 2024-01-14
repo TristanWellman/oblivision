@@ -198,7 +198,18 @@ void OV_addText(const char *window_ID, char *text) {
 
 }
 
-void OV_createButton(const char *window_ID, const char *button_ID) {
+void OV_createButton(const char *window_ID, const char *button_ID, OV_vec2 pos) {
+    int buttonWidth = 50;
+    int buttonHeight = 50;
+    int i,j;
+    for(i=0;i<MAX_WIGS;i++) {
+        if(wigData.names[i] == window_ID) {
+            for(j=0;j<MAX_WIGS;j++) {
+                //if(wigData.buttons.button_names[i][j] == NULL)
+            }
+            break;
+        }
+    }
 
 }
 
@@ -229,51 +240,56 @@ void load_widgets() {
     current_x = 0;
     current_y = 0;
     int x2,y2;
-    for(i = 0; (unsigned int)i < sizeof(wigData.names); i++) {
-        if(wigData.names[i] == NULL) {
-            break;
-        }
-        for(current_x = 0; current_x < winData.width; current_x++) {
-            if(current_x == wigData.wig_pos[i].x+1) {
-                break;
-            }
-            for(current_y = 0; current_y < winData.height; current_y++) {
-                 if(current_x == wigData.wig_pos[i].x && current_y == wigData.wig_pos[i].y) {
-                     winData.pixel_data[current_y * winData.width + current_x] = ORANGE;
-                     if(i == custom_window_fill) {
-                         for(x2 = wigData.wig_pos[i].x; x2 < (wigData.wig_pos[i].x + wigData.wig_sizes[i].x); x2++) {
-                             for(y2 = wigData.wig_pos[i].y; y2 < (wigData.wig_pos[i].y + wigData.wig_sizes[i].y); y2++) {
-                                 winData.pixel_data[y2 * winData.width + x2] = current_pixel_data[x2+y2];
-                             }
-                         }
-                     } else {
-                         for (x2 = wigData.wig_pos[i].x; x2 < (wigData.wig_pos[i].x + wigData.wig_sizes[i].x); x2++) {
-                             for (y2 = wigData.wig_pos[i].y;
-                                  y2 < (wigData.wig_pos[i].y + wigData.wig_sizes[i].y); y2++) {
-                                 winData.pixel_data[y2 * winData.width + x2] = WIN_BG;
-                             }
-                         }
-                     }
-                     /*make title bar*/
-                     OV_vec2 bar_pos = {wigData.wig_pos[i].x, wigData.wig_pos[i].y-20};
-                     OV_vec2 bar_size = {wigData.wig_sizes[i].x, 20};
-                     int x3,y3;
+	if(wigData.wig_pos != winData.opt.wigPosBack) {
+    	for(i = 0; (unsigned int)i < sizeof(wigData.names); i++) {
+        	if(wigData.names[i] == NULL) {
+            	break;
+        	}
+        	for(current_x = 0; current_x < winData.width; current_x++) {
+            	if(current_x == wigData.wig_pos[i].x+1) {
+                	break;
+            	}
+            	for(current_y = 0; current_y < winData.height; current_y++) {
+                 	if(current_x == wigData.wig_pos[i].x && current_y == wigData.wig_pos[i].y) {
+                     	winData.pixel_data[current_y * winData.width + current_x] = ORANGE;
+                     	if(i == custom_window_fill) {
+                         	for(x2 = wigData.wig_pos[i].x; x2 < (wigData.wig_pos[i].x + wigData.wig_sizes[i].x); x2++) {
+                             	for(y2 = wigData.wig_pos[i].y; y2 < (wigData.wig_pos[i].y + wigData.wig_sizes[i].y); y2++) {
+                                	 winData.pixel_data[y2 * winData.width + x2] = current_pixel_data[x2+y2];
+                            	 }
+                        	 }
+                     	} else {
+                         	for (x2 = wigData.wig_pos[i].x; x2 < (wigData.wig_pos[i].x + wigData.wig_sizes[i].x); x2++) {
+                            	 for (y2 = wigData.wig_pos[i].y;
+                        	          y2 < (wigData.wig_pos[i].y + wigData.wig_sizes[i].y); y2++) {
+                     	            winData.pixel_data[y2 * winData.width + x2] = WIN_BG;
+                     	        }
+                     	    }
+                     	}
+                     	/*make title bar*/
+                     	OV_vec2 bar_pos = {wigData.wig_pos[i].x, wigData.wig_pos[i].y-20};
+                     	OV_vec2 bar_size = {wigData.wig_sizes[i].x, 20};
+                     	int x3,y3;
 
-                     for(x3 = bar_pos.x; x3 < (bar_pos.x + bar_size.x); x3++) {
-                         for(y3 = bar_pos.y; y3 < (bar_pos.y + bar_size.y); y3++) {
-                             winData.pixel_data[y3 * winData.width + x3] = WINBAR_BG;
-                         }
-                     }
-                     break;
-                }
-            }
-        }
-        /*Load bar title*/
-        winData.text_surface[i] = TTF_RenderText_Blended(winData.font,
-                                                       wigData.names[i],
-                                                       (SDL_Color){255,255,255,255});
-        winData.text_texture[i] = SDL_CreateTextureFromSurface(winData.renderer, winData.text_surface[i]);
-    }
+                     	for(x3 = bar_pos.x; x3 < (bar_pos.x + bar_size.x); x3++) {
+                         	for(y3 = bar_pos.y; y3 < (bar_pos.y + bar_size.y); y3++) {
+                            	 winData.pixel_data[y3 * winData.width + x3] = WINBAR_BG;
+                        	 }
+                     	}
+                    	 break;
+                	}
+            	}
+        	}
+        	/*Load bar title*/
+        	winData.text_surface[i] = TTF_RenderText_Blended(winData.font,
+                	                                       wigData.names[i],
+            	                                           (SDL_Color){255,255,255,255});
+        	winData.text_texture[i] = SDL_CreateTextureFromSurface(winData.renderer, winData.text_surface[i]);
+    	}
+	}
+	int j,k;
+	memcpy(winData.opt.wigPosBack, wigData.wig_pos, ARRLEN(wigData.wig_pos));
+	//memcpy(winData.opt.pixelDataBack, winData.pixel_data, ARRLEN(winData.pixel_data)); 
 }
 
 void unload_widget(int widget_offset) {
@@ -456,7 +472,7 @@ void OV_renderFrame(SDL_Texture *oglTexture, uint32_t *oglPixBuf) {
     }
 
     winData.pixel_data[0] = RED;
-    //SDL_Delay(38);
+    //SDL_Delay(12);
 
     Uint64 end = SDL_GetPerformanceCounter();
     float elapsed = (end - start)/(float)SDL_GetPerformanceFrequency();
