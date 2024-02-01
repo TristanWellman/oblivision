@@ -247,6 +247,16 @@ void OV_pollEvent(SDL_Event event);
 float OV_FPS();
 
 /**
+ * @brief updates the global OpenGL rect for rendering
+ * 
+ * @param x x location of OGL renderer
+ * @param y y location of OGL renderer
+ * @param w width of OGL renderer
+ * @param h height of OGL renderer
+ * */
+void OV_updateOGLRect(int x, int y, int w, int h);
+
+/**
  * @brief Renders current frame filled with pixel data
  * @note Oblivision should be initialized prior to OV_renderFrame*/
 void OV_renderFrame(SDL_Texture *oglTexture, uint32_t *oglPixBuf);
