@@ -32,6 +32,9 @@
 #define ARRLEN(x) \
 		(sizeof(x)/sizeof(x[0]))
 
+#define RECTCHECK(r) \
+		((r.x)>0||(r.y)>0||(r.w)>0||(r.h)>0)
+
 #define OV_DEBUG_ENABLE 1
 #define OV_OPENGL_ENABLE 2
 
@@ -89,7 +92,8 @@ struct windata {
 
     int ovflag;
     int opengl_enabled;
-    SDL_Window *window;
+    SDL_Rect ovogl_global_rect;
+	SDL_Window *window;
     SDL_Renderer *renderer;
 
     SDL_Texture *target_texture;

@@ -167,10 +167,16 @@ void OV_addText(const char *window_ID, char *text) {
                 if(wigData.wig_texts[j][k] == NULL ||
                     wigData.wig_texts[j][k] == text) {
 
-                    wigData.wig_texts[j][k] = text;
-
-                    wigData.wig_texts_surfaces[j][k] = TTF_RenderText_Solid(winData.font, wigData.wig_texts[j][k],(SDL_Color) {0,0,0,255});
-                    wigData.wig_texts_textures[j][k] = SDL_CreateTextureFromSurface(winData.renderer, wigData.wig_texts_surfaces[j][k]);
+                    char *check = strstr(text, "~b~");
+					if(check!=NULL) {
+						check++;
+						wigData.wig_texts[j][k] = text;
+                    	wigData.wig_texts_surfaces[j][k] = TTF_RenderText_Solid(winData.font, check,(SDL_Color) {0,0,0,255});
+					} else {
+						wigData.wig_texts[j][k] = text;
+						wigData.wig_texts_surfaces[j][k] = TTF_RenderText_Solid(winData.font, wigData.wig_texts[j][k],(SDL_Color) {0,0,0,255});   
+					}
+					wigData.wig_texts_textures[j][k] = SDL_CreateTextureFromSurface(winData.renderer, wigData.wig_texts_surfaces[j][k]);
 
                     wigData.wig_texts_rects[j][k].x = wigData.wig_pos[j].x;
 
@@ -209,7 +215,7 @@ void OV_createButton(const char *window_ID, const char *button_ID, OV_vec2 pos) 
 				char buf[256];
 				strcpy(buf,button_ID);
 				if(buf == wigData.buttons.button_names[i][j]) {
-					snprintf(buf, sizeof(buf), "%s:%d",button_ID,l);
+					snprintf(buf, sizeof(buf), "~b~%s:%d",button_ID,l);
 					strcpy((char *)button_ID,buf);
 					l++;
 				}
@@ -395,6 +401,13 @@ float OV_FPS() {
     return winData.OV_FPS;
 }
 
+void OV_updateOGLRect(int x, int y, int w, int h) {
+	winData.ovogl_global_rect.x = x;
+	winData.ovogl_global_rect.y = y;
+	winData.ovogl_global_rect.w = w;
+	winData.ovogl_global_rect.h = h;
+}
+
 void free_OV() {
     int k,l;
     for(l = 0; l < MAX_WIGS; l++) {
@@ -428,10 +441,12 @@ void OV_renderFrame(SDL_Texture *oglTexture, uint32_t *oglPixBuf) {
                    NULL, NULL);
 
     if(winData.opengl_enabled == 1) {
-        oglTexture = SDL_CreateTexture(winData.renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, winData.width, winData.height);
+		SDL_Rect oglRect;
+		if(RECTCHECK(winData.ovogl_global_rect)) oglRect = winData.ovogl_global_rect; 
+		oglTexture = SDL_CreateTexture(winData.renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, winData.width, winData.height);
         SDL_UpdateTexture(oglTexture, NULL,
             oglPixBuf, winData.width * sizeof(uint32_t));
-        SDL_RenderCopy(winData.renderer,oglTexture,NULL,NULL);
+        SDL_RenderCopy(winData.renderer,oglTexture,NULL,&oglRect);
     }
     /*images are first*/
     int m;
