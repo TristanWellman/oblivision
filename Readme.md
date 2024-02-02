@@ -10,8 +10,11 @@
 
 ## Support
 
-- [x] Windows XP - Windows 10
-- [x] Linux
+Tested: 
+
+- [x] Windows 11/10/7/vista/xp
+- [x] Linux Arch/Debian
+- [x] MacOS Intel&Arm
 
 ## Example
 
