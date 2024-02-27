@@ -187,13 +187,13 @@ void OV_addText(const char *window_ID, char *text) {
                     }
                     wigData.wig_texts_rects[j][k].h = 20;
                     wigData.wig_texts_rects[j][k].w = strlen(wigData.wig_texts[j][k])*(PIXELSPERCHAR);
-                    if(winData.ovflag == OV_DEBUG_ENABLE) {
+                    /*if(winData.ovflag == OV_DEBUG_ENABLE) {
                         log_debug("[%s]: %s[%d]: (%d,%d)\n",
                                wigData.names[j],
                                wigData.wig_texts[j][k], k,
                                wigData.wig_texts_rects[j][k].x,
                                wigData.wig_texts_rects[j][k].y);
-                    }
+                    }*/
                     break;
                 }
             }
@@ -256,14 +256,11 @@ void load_widgets() {
     int x2,y2;
 	if(wigData.wig_pos != winData.opt.wigPosBack) {
     	for(i = 0; (unsigned int)i < sizeof(wigData.names); i++) {
-        	if(wigData.names[i] == NULL) {
-            	break;
-        	}
+        	if(wigData.names[i] == NULL) break;
         	for(current_x = 0; current_x < winData.width; current_x++) {
-            	if(current_x == wigData.wig_pos[i].x+1) {
-                	break;
-            	}
+            	if(current_x == wigData.wig_pos[i].x+1) break;
             	for(current_y = 0; current_y < winData.height; current_y++) {
+				    if(current_y == wigData.wig_pos[i].y+1) break;
                  	if(current_x == wigData.wig_pos[i].x && current_y == wigData.wig_pos[i].y) {
                      	winData.pixel_data[current_y * winData.width + current_x] = ORANGE;
                      	if(i == custom_window_fill) {
@@ -277,7 +274,7 @@ void load_widgets() {
                             	 for (y2 = wigData.wig_pos[i].y;
                         	          y2 < (wigData.wig_pos[i].y + wigData.wig_sizes[i].y); y2++) {
                      	            winData.pixel_data[y2 * winData.width + x2] = WIN_BG;
-                     	        }
+								 }
                      	    }
                      	}
                      	/*make title bar*/
@@ -494,7 +491,6 @@ void OV_renderFrame(SDL_Texture *oglTexture, uint32_t *oglPixBuf) {
         }
     }
 
-    winData.pixel_data[0] = RED;
     //SDL_Delay(12);
 
     Uint64 end = SDL_GetPerformanceCounter();
@@ -582,7 +578,7 @@ int OVInit(SDL_Window *window, int width, int height, const char *winname) {
             sizeof(char *)*(winData.width * winData.height)
             );*/
     winData.renderer = SDL_CreateRenderer(winData.window, -1,
-                                          SDL_RENDERER_ACCELERATED);
+                                          SDL_RENDERER_SOFTWARE);
 
     if(winData.renderer == NULL) {
         printf("FATAL:: Could not init renderer!\n");
