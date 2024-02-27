@@ -4,6 +4,7 @@
 
 struct windata winData;
 struct widget_data wigData;
+struct windataopt backup;
 
 int current_x = 0;
 int current_y = 0;
@@ -21,8 +22,13 @@ void OV_colorTest() {
     current_x = 0;
     current_y = 0;
 }
-
+int *backup_pointer = &backup.pixelDataBack[0];
 void OV_setBackground(OV_COLOR bg_color) {
+    if(backup.pixelDataBack[0]==bg_color.color) {
+	    //memcpy(winData.pixel_data, backup.pixelDataBack, sizeof(backup.pixelDataBack));
+		winData.pixel_data[0] = (int)*backup_pointer;
+		return;
+	}
     winData.bg_color = bg_color;
     if ((unsigned int)winData.pixel_data[0] != RED) {
         for (current_x = 0; current_x < winData.width; current_x++) {
@@ -34,6 +40,7 @@ void OV_setBackground(OV_COLOR bg_color) {
     current_x = 0;
     current_y = 0;
 
+    *backup_pointer = winData.pixel_data[0];
 }
 
 int custom_window_fill = MAX_WIGS+1;
@@ -621,9 +628,7 @@ int OVInit(SDL_Window *window, int width, int height, const char *winname) {
 
     int i;
     for(i = 0; (unsigned int)i < sizeof(winData.pixel_data); i++) {
-        if (i >= winData.width * winData.height) {
-            break;
-        }
+        if (i >= winData.width * winData.height) break;
         winData.pixel_data[i] = 0;
     }
     return 0;
